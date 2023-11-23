@@ -1,0 +1,6 @@
+[submodule "third-party/libft-full"]
+	path = third-party/libft-full
+	url = git@github.com:Dyamen1411/42-libft-full.git
+[submodule "third-party/minilibx-linux"]
+	path = third-party/minilibx-linux
+	url = git@github.com:42Paris/minilibx-linux.git
