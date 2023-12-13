@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2023/11/23 21:43:22 by amassias         ###   ########.fr        #
+#    Updated: 2023/12/11 12:45:35 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,15 +35,16 @@ LIB_MLX			:=	$(LIB_MLX_PATH)/libmlx.a
 #                                                                              #
 # **************************************************************************** #
 
-CFLAGS			:=		\
-	-I$(INC_DIR)		\
-	-I$(LIB_FT_PATH)	\
-	-I$(LIB_MLX_PATH)	\
+CFLAGS			:=					\
+	-I$(INC_DIR)					\
+	-I$(LIB_FT_PATH)				\
+	-I$(LIB_MLX_PATH)				\
+	-DCL_TARGET_OPENCL_VERSION=210	\
 	-Wall -Werror -Wextra -g
-LFLAGS			:=		\
-	-L$(LIB_FT_PATH)	\
-	-L$(LIB_MLX_PATH)	\
-	-lmlx -lXext -lX11 -lm -lz -lftfull
+LFLAGS			:=					\
+	-L$(LIB_FT_PATH)				\
+	-L$(LIB_MLX_PATH)				\
+	-lftfull -lOpenCL -lmlx -lXext -lX11 -lm -lz
 
 # **************************************************************************** #
 #                                                                              #

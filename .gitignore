@@ -1,3 +1,5 @@
 binaries
 fractol
 *.o
+.vscode
+valgrind-supressions
