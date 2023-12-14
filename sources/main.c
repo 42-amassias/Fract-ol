@@ -6,210 +6,14 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/06 15:23:11 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/13 20:38:58 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/14 21:16:42 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
-
 #include "fractol.h"
+#include "opencl.h"
 
-typedef enum e_cl_arg_type {
-	CL_ARG_TYPE__CHAR,
-	CL_ARG_TYPE__SHORT,
-	CL_ARG_TYPE__INT,
-	CL_ARG_TYPE__LONG,
-	CL_ARG_TYPE__UCHAR,
-	CL_ARG_TYPE__USHORT,
-	CL_ARG_TYPE__UINT,
-	CL_ARG_TYPE__ULONG,
-	CL_ARG_TYPE__FLOAT,
-	CL_ARG_TYPE__DOUBLE,
-	CL_ARG_TYPE_COUNT
-}	t_cl_arg_type;
-
-typedef struct s_cl_type {
-	const char		*str_type;
-	t_cl_arg_type	internal_type;
-	size_t			size;
-}	t_cl_type;
-
-const t_cl_type	g_cl_types[] = {
-	{"char", CL_ARG_TYPE__CHAR, sizeof(cl_char)},
-	{"short", CL_ARG_TYPE__SHORT, sizeof(cl_short)},
-	{"int", CL_ARG_TYPE__INT, sizeof(cl_int)},
-	{"long", CL_ARG_TYPE__LONG, sizeof(cl_long)},
-	{"uchar", CL_ARG_TYPE__UCHAR, sizeof(cl_uchar)},
-	{"ushort", CL_ARG_TYPE__USHORT, sizeof(cl_ushort)},
-	{"uint", CL_ARG_TYPE__UINT, sizeof(cl_uint)},
-	{"ulong", CL_ARG_TYPE__ULONG, sizeof(cl_ulong)},
-	{"float", CL_ARG_TYPE__FLOAT, sizeof(cl_float)},
-	{"double", CL_ARG_TYPE__DOUBLE, sizeof(cl_double)},
-};
-
-void	cl_release_platform_list(
-			cl_platform_id *platforms,
-			cl_uint platform_count)
-{
-	while (platform_count--)
-		free(platforms[platform_count]);
-	free(platforms);
-}
-
-void	cl_release_device_list(
-			cl_device_id *devices,
-			cl_uint device_count)
-{
-	while (device_count--)
-	{
-		clReleaseDevice(devices[device_count]);
-		free(devices[device_count]);
-	}
-	free(devices);
-}
-
-/**
- * @brief Queries 
- * @param id 
- * @return int 
- */
-int	cl_get_platform_id(
-		cl_platform_id *id)
-{
-	cl_platform_id	*platforms;
-	cl_uint			platform_count;
-	cl_uint			platform_index;
-	size_t			platform_name_size;
-	char			*platform_name;
-	char			*option;
-
-	if (clGetPlatformIDs(0, NULL, &platform_count) != CL_SUCCESS)
-		return (EXIT_FAILURE);
-	platforms = (cl_platform_id *) malloc(platform_count * sizeof(cl_platform_id));
-	if (platforms == NULL)
-		return (EXIT_FAILURE);
-	if (clGetPlatformIDs(platform_count, platforms, NULL)  != CL_SUCCESS)
-		return (cl_release_platform_list(platforms, 0), EXIT_FAILURE);
-	if (platform_count <= 0)
-		return (cl_release_platform_list(platforms, platform_count), EXIT_FAILURE);
-	ft_printf("OpenCL platofrms available:\n");
-	platform_index = 0;
-	while (platform_index < platform_count)
-	{
-		if (clGetPlatformInfo(platforms[platform_index], CL_PLATFORM_NAME, 0, NULL, &platform_name_size) != CL_SUCCESS)
-			return (cl_release_platform_list(platforms, platform_count), EXIT_FAILURE);
-		platform_name = (char *) malloc(platform_name_size);
-		if (platform_name == NULL)
-			return (cl_release_platform_list(platforms, platform_count), EXIT_FAILURE);
-		if (clGetPlatformInfo(platforms[platform_index], CL_PLATFORM_NAME, platform_name_size, platform_name, NULL) != CL_SUCCESS)
-			return (free(platform_name), cl_release_platform_list(platforms, platform_count), EXIT_FAILURE);
-		ft_printf("\t%d: %s\n", platform_index + 1, platform_name);
-		free(platform_name);
-		++platform_index;
-	}
-	if (platform_count > 1)
-	{
-		ft_printf("Chose a platform : ");
-		while (1)
-		{
-			option = get_next_line(STDIN_FILENO);
-			if (option != NULL)
-			{
-				platform_index = ft_atoi(option);
-				free(option);
-				if (platform_index > 0 && platform_index <= platform_count)
-					break ;
-			}
-			ft_printf("Chose a platform : ");
-		}
-	}
-	*id = platforms[platform_index - 1];
-	platform_index = 0;
-	while (platform_index < platform_count)
-	{
-		if (platforms[platform_index] != *id)
-			free(platforms[platform_index]);
-		++platform_index;
-	}
-	return (free(platforms), EXIT_SUCCESS);
-}
-
-char	*cl_get_device_info(
-			cl_device_id device_id,
-			cl_int info)
-{
-	size_t	buffer_size;
-	char	*buffer;
-
-	if (clGetDeviceInfo(device_id, info, 0, NULL, &buffer_size))
-		return (NULL);
-	buffer = (char *) malloc(buffer_size);
-	if (buffer == NULL)
-		return (NULL);
-	if (clGetDeviceInfo(device_id, info, buffer_size, buffer, NULL))
-		return (free(buffer), NULL);
-	return (buffer);
-}
-
-int	cl_get_device_id(
-		cl_platform_id platform_id,
-		cl_device_id *id)
-{
-	cl_device_id	*devices;
-	cl_uint			device_count;
-	cl_uint			device_index;
-	char			*buffer;
-	char			*option;
-
-	if (clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_ALL, 0, NULL, &device_count) != CL_SUCCESS)
-		return (EXIT_FAILURE);
-	devices = (cl_device_id *) malloc(device_count * sizeof(cl_device_id));
-	if (devices == NULL)
-		return (EXIT_FAILURE);
-	if (clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_ALL, device_count, devices, NULL) != CL_SUCCESS)
-		return (cl_release_device_list(devices, 0), EXIT_FAILURE);
-	if (device_count <= 0)
-		return (cl_release_device_list(devices, device_count), EXIT_FAILURE);
-	ft_printf("OpenCL devices available:\n");
-	device_index = 0;
-	while (device_index < device_count)
-	{
-		buffer = cl_get_device_info(devices[device_index], CL_DEVICE_NAME);
-		if (buffer == NULL)
-			return (cl_release_device_list(devices, device_count), EXIT_FAILURE);
-		ft_printf("\t%d: %s >> ", device_index + 1, buffer);
-		free(buffer);
-		buffer = cl_get_device_info(devices[device_index], CL_DEVICE_VERSION);
-		ft_printf("%s\n", buffer);
-		free(buffer);
-		++device_index;
-	}
-	if (device_count > 1)
-	{
-		ft_printf("Chose a device : ");
-		while (1)
-		{
-			option = get_next_line(STDIN_FILENO);
-			if (option != NULL)
-			{
-				device_index = ft_atoi(option);
-				free(option);
-				if (device_index > 0 && device_index <= device_count)
-					break ;
-			}
-			ft_printf("Chose a device : ");
-		}
-	}
-	*id = devices[device_index - 1];
-	device_index = 0;
-	while (device_index < device_count)
-	{
-		if (devices[device_index] != *id)
-			free(devices[device_index]);
-		++device_index;
-	}
-	return (free(devices), EXIT_SUCCESS);
-}
+#include <X11/Xlib.h>
 
 cl_int	set_kernel_arg__int(
 		cl_kernel kernel,
@@ -273,11 +77,83 @@ void	change_parameter__double(
 	free(line);
 }
 
+static char	*param_str_buffer = NULL;
+
+char	*get_arg_as_string(
+			const t_kernel_arg *arg)
+{
+	char	*v;
+
+	v = NULL;
+	if (arg->type == CL_ARG_TYPE__CHAR)
+		v = ft_itoa(*(cl_char *)arg->value);
+	else if (arg->type == CL_ARG_TYPE__SHORT)
+		v = ft_itoa(*(cl_short *)arg->value);
+	else if (arg->type == CL_ARG_TYPE__INT)
+		v = ft_itoa(*(cl_int *)arg->value);
+	else if (arg->type == CL_ARG_TYPE__LONG)
+		v = ft_itoa(*(cl_long *)arg->value);
+	else if (arg->type == CL_ARG_TYPE__UCHAR)
+		v = ft_itoa(*(cl_uchar *)arg->value);
+	else if (arg->type == CL_ARG_TYPE__USHORT)
+		v = ft_itoa(*(cl_ushort *)arg->value);
+	else if (arg->type == CL_ARG_TYPE__UINT)
+		v = ft_itoa(*(cl_uint *)arg->value);
+	else if (arg->type == CL_ARG_TYPE__ULONG)
+		v = ft_itoa(*(cl_ulong *)arg->value);
+	// else if (arg->type == CL_ARG_TYPE__FLOAT)
+	// 	v = ft_ftoa(*(cl_float *)arg->value);
+	// else if (arg->type == CL_ARG_TYPE__DOUBLE)
+	// 	v = ft_ftoa(*(cl_double *)arg->value);
+	return (v);
+}
+
 int	handle_keys(
 		int keycode,
 		t_data *data)
 {
-	if (keycode == 'q')
+	if (keycode == 'p')
+	{
+		size_t			i;
+		// size_t			len;
+		char			*tmp;
+		// char			*v;
+		static size_t	size;
+		char			*padd;
+
+		if (param_str_buffer == NULL)
+		{
+			i = 0;
+			size = 0;
+			param_str_buffer = malloc(1);
+			param_str_buffer[0] = '\0';
+			while (i < data->cl.kernel->arg_count)
+			{
+				padd = ft_strdup("               ");
+				ft_memcpy(padd, data->cl.kernel->args[i].name, ft_strlen(data->cl.kernel->args[i].name));
+				tmp = ft_strcat(param_str_buffer, padd);
+				free(padd);
+				free(param_str_buffer);
+				param_str_buffer = tmp;
+				tmp = ft_strcat(param_str_buffer, " : ");
+				free(param_str_buffer);
+				param_str_buffer = tmp;
+				padd = malloc(128);
+				if (data->cl.kernel->args[i].type == CL_ARG_TYPE__DOUBLE)
+					sprintf(padd, "%lf\n", *(cl_double *)data->cl.kernel->args[i].value);
+				else if (data->cl.kernel->args[i].type == CL_ARG_TYPE__INT)
+					sprintf(padd, "%d\n", *(cl_int *)data->cl.kernel->args[i].value);
+				else
+					sprintf(padd, "x\n");
+				tmp = ft_strcat(param_str_buffer, padd);
+				free(padd);
+				free(param_str_buffer);
+				param_str_buffer = tmp;
+				++i;
+			}
+		}
+	}
+	else if (keycode == 'q')
 		mlx_loop_end(data->mlx.mlx);
 	else if (keycode == 'i')
 		change_parameter__int(
@@ -337,7 +213,7 @@ int	kill_program(
 	return (code);
 }
 
-int loop(
+int	loop(
 		t_data *data)
 {
 	static const size_t	global_work_size[] = {WIDTH, HEIGHT};
@@ -359,6 +235,8 @@ int loop(
 	mlx_put_image_to_window(
 		data->mlx.mlx, data->mlx.window,
 		data->mlx.img, 0, 0);
+	if (param_str_buffer != NULL)
+		mlx_string_put(data->mlx.mlx, data->mlx.window, 100, 100, 0xFFFFFF, param_str_buffer);
 	return (0);
 }
 
@@ -383,22 +261,6 @@ int	read_file(
 	(*file_buffer_ptr)[*file_size] = '\0';
 	fclose(file);
 	return (EXIT_SUCCESS);
-}
-
-void	cleanup_kernels(
-			t_data *data,
-			size_t count)
-{
-	while (count-- > 0)
-	{
-		while (data->cl.kernels[count].arg_count-- > 0)
-			free((void *)data->cl.kernels[count].args[data->cl.kernels[count].arg_count].name);
-		free((void *)data->cl.kernels[count].args);
-		free((void *)data->cl.kernels[count].name);
-		free((void *)data->cl.kernels[count]._arg_values);
-		clReleaseKernel(data->cl.kernels[count].kernel);
-	}
-	free((void *)data->cl.kernels);
 }
 
 // TODO: cleanup ALL the loaded kernels.
@@ -495,188 +357,49 @@ int	get_param_size(
 	return (EXIT_SUCCESS);
 }
 
-int	check_special_argument(
-	t_kernel *kernel,
-	cl_uint index,
-	const char *_name,
-	const char *_type,
-	cl_kernel_arg_access_qualifier _qualifier)
+int	get_kernel_arg_info(
+		cl_kernel kernel,
+		cl_uint index,
+		cl_kernel_arg_info info,
+		void **buffer_ptr)
 {
-	cl_kernel_arg_access_qualifier	qualifier;
-	char							*name;
-	size_t							size;
-	char							type[512];
-
-	clGetKernelArgInfo(kernel->kernel, index, CL_KERNEL_ARG_NAME, 0, NULL, &size);
-	name = (char *) malloc(size * sizeof(char));
-	if (name == NULL)
-		return (EXIT_FAILURE);
-	clGetKernelArgInfo(kernel->kernel, index, CL_KERNEL_ARG_NAME, size, name, NULL);
-	if (ft_strcmp(name, _name) != 0)
-		return (printf("Expected argument %u to be \"%s\" but got \"%s\".\n", index, _name, name), free(name), EXIT_FAILURE);
-	clGetKernelArgInfo(kernel->kernel, index, CL_KERNEL_ARG_TYPE_NAME, 512, type, NULL);
-	if (ft_strcmp(type, _type) != 0)
-		return (printf("Expected argument %u's type to be \"%s\" but got \"%s\".\n", index, _type, type), free(name), EXIT_FAILURE);
-	clGetKernelArgInfo(kernel->kernel, index, CL_KERNEL_ARG_ADDRESS_QUALIFIER, sizeof(cl_kernel_arg_access_qualifier), &qualifier, NULL);
-	if (qualifier != _qualifier)
-		return (printf("Expected argument %u's type qualifier to be \"%u\" but got \"%u\".\n", index, _qualifier, qualifier), free(name), EXIT_FAILURE);
-	printf("\t> %-10s %-15s (type: %2d, size: %2zu)\n", type, name, -1, sizeof(void *));
-	free(name);
-	return (EXIT_SUCCESS);
-}
-
-int	build_kernel(
-		t_kernel *kernel)
-{
-	size_t	i;
 	size_t	size;
-	size_t	arg_buffer_size;
-	char	type[512];
-	cl_int	error_code;
 
-	printf("Building kernel \"%s\"\n", kernel->name);
-	error_code = clGetKernelInfo(
-		kernel->kernel, CL_KERNEL_NUM_ARGS,
-		sizeof(cl_uint), &kernel->arg_count,
-		NULL);
-	if (error_code != CL_SUCCESS)
-		return (printf("%d\n", error_code), EXIT_FAILURE);
-	if (kernel->arg_count < 3)
-		return (printf("Missing arguments\n"), EXIT_FAILURE);
-	printf("\tArg count: %u\n", kernel->arg_count);
-	kernel->arg_count -= 3;
-	if (check_special_argument(kernel, 0, "screen", "int*", CL_KERNEL_ARG_ADDRESS_GLOBAL) != EXIT_SUCCESS
-		|| check_special_argument(kernel, 1, "dx", "double", CL_KERNEL_ARG_ADDRESS_PRIVATE) != EXIT_SUCCESS
-		|| check_special_argument(kernel, 2, "dy", "double", CL_KERNEL_ARG_ADDRESS_PRIVATE) != EXIT_SUCCESS)
+	if (clGetKernelArgInfo(kernel, index, info, 0, NULL, &size) != CL_SUCCESS)
 		return (EXIT_FAILURE);
-	kernel->args = (t_kernel_arg *) malloc(kernel->arg_count * sizeof(t_kernel_arg));
-	if (kernel->args == NULL)
-		return (printf("bite1\n"), EXIT_FAILURE);
-	arg_buffer_size = 0;
-	i = 0;
-	while (i < kernel->arg_count)
-	{
-		clGetKernelArgInfo(kernel->kernel, i + 3, CL_KERNEL_ARG_NAME, 0, NULL, &size);
-		kernel->args[i].name = (const char *) malloc(size * sizeof(char));
-		if (kernel->args[i].name == NULL)
-		{
-			while (i-- > 0)
-				free((void *)kernel->args[i].name);
-			return (free(kernel->args), EXIT_FAILURE);
-		}
-		clGetKernelArgInfo(kernel->kernel, i + 3, CL_KERNEL_ARG_NAME, size, (void *)kernel->args[i].name, NULL);
-		clGetKernelArgInfo(kernel->kernel, i + 3, CL_KERNEL_ARG_TYPE_NAME, 512, type, NULL);
-		if (get_param_size(type, &kernel->args[i].size, &kernel->args[i].type) != EXIT_SUCCESS)
-		{
-			ft_printf("Unsuported type: \"%s\"\n", type);
-			while (i-- > 0)
-				free((void *)kernel->args[i].name);
-			return (free(kernel->args), EXIT_FAILURE);
-		}
-		arg_buffer_size += kernel->args[i].size;
-		printf("\t> %-10s %-15s (type: %2u, size: %2zu)\n", type, kernel->args[i].name, kernel->args[i].type, kernel->args[i].size);
-		++i;
-	}
-	kernel->_arg_values = (char *) malloc(arg_buffer_size);
-	if (kernel->_arg_values == NULL)
-	{
-		while (i-- > 0)
-			free((void *)kernel->args[i].name);
-		return (free(kernel->args), EXIT_FAILURE);
-	}
-	printf("\n");
+	*buffer_ptr = (void *) malloc(size);
+	if (*buffer_ptr == NULL)
+		return (EXIT_FAILURE);
+	if (clGetKernelArgInfo(kernel, index,
+			info, size, *buffer_ptr, NULL) != CL_SUCCESS)
+		return (free(*buffer_ptr), EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
-int	build_kernels(
-		t_data *data)
+int	check_special_argument(
+	const t_kernel *kernel,
+	const t_arg_info *arg_info)
 {
-	size_t		i;
-	cl_int		error_code;
-	char		*name;
+	cl_kernel_arg_access_qualifier	*qualifier;
+	char							*name;
+	char							*type;
 
-	name = data->cl._kernel_names;
-	i = 0;
-	while (i < data->cl.kernel_count)
-	{
-		data->cl.kernels[i].name = name;
-		data->cl.kernels[i].kernel = clCreateKernel(
-				data->cl.program,
-				data->cl.kernels[i].name,
-				&error_code);
-		if (error_code != CL_SUCCESS)
-			return (cleanup_kernels(data, i), EXIT_FAILURE);
-		if (build_kernel(&data->cl.kernels[i]) != EXIT_SUCCESS)
-			return (cleanup_kernels(data, i), EXIT_FAILURE);
-		while (*name)
-			++name;
-		++name;
-		++i;
-	}
-	data->cl.kernel = data->cl.kernels;
-	return (EXIT_SUCCESS);
-}
-
-int	init_opencl_kernels(
-		t_data *data)
-{
-	cl_int	error_code;
-	size_t	program_size;
-	char	*program;
-	char	_log[LOG_SIZE + 1];
-
-	error_code = read_file("kernels/fract-ol_kernels.cl", &program, &program_size);
-	if (error_code != EXIT_SUCCESS)
+	if (get_kernel_arg_info(kernel->kernel, arg_info->index, CL_KERNEL_ARG_NAME, (void **)&name) != EXIT_SUCCESS)
 		return (EXIT_FAILURE);
-	data->cl.program = clCreateProgramWithSource(data->cl.context, 1, (const char **)&program, NULL, &error_code);
-	free(program);
-	if (error_code != CL_SUCCESS)
-		return (EXIT_FAILURE);
-	error_code = clBuildProgram(data->cl.program, 1, &data->cl.device, "-cl-kernel-arg-info", NULL, NULL);
-	if (error_code != CL_SUCCESS)
-	{
-		clGetProgramBuildInfo(data->cl.program, data->cl.device, CL_PROGRAM_BUILD_LOG, LOG_SIZE, _log, NULL);
-		ft_printf("Error %d: Failed to build program executable!\nLog:\n%s\n", error_code, _log);
-		return (EXIT_FAILURE);
-	}
-	clGetProgramInfo(data->cl.program, CL_PROGRAM_NUM_KERNELS, sizeof(size_t), &data->cl.kernel_count, NULL);
-	if (data->cl.kernel_count == 0)
-		return (ft_printf("No kernels.\n"), EXIT_FAILURE);
-	clGetProgramInfo(data->cl.program, CL_PROGRAM_KERNEL_NAMES, 0, NULL, &data->cl._kernel_names_size);
-	data->cl._kernel_names = (char *) ft_calloc(data->cl._kernel_names_size, sizeof(char));
-	if (data->cl._kernel_names == NULL)
-		return (EXIT_FAILURE);
-	clGetProgramInfo(data->cl.program, CL_PROGRAM_KERNEL_NAMES, data->cl._kernel_names_size, data->cl._kernel_names, NULL);
-	printf("Kernel names: %s\n", data->cl._kernel_names);
-	parse_kernel_names(data->cl._kernel_names);
-	data->cl.kernels = (t_kernel *) malloc(data->cl.kernel_count * sizeof(t_kernel));
-	if (data->cl.kernels == NULL)
-		return (EXIT_FAILURE);
-	if (build_kernels(data) != EXIT_SUCCESS)
-		return (EXIT_FAILURE);
-	return (EXIT_SUCCESS);
-}
-
-int	init_opencl(
-		t_data *data)
-{
-	cl_int	error_code;
-
-	if (cl_get_platform_id(&data->cl.platform) != EXIT_SUCCESS)
-		return (EXIT_FAILURE);
-	if (cl_get_device_id(data->cl.platform, &data->cl.device) != EXIT_SUCCESS)
-		return (EXIT_FAILURE);
-	data->cl.context = clCreateContext(NULL, 1, &data->cl.device, NULL, NULL, &error_code);
-	if (error_code != CL_SUCCESS)
-		return (EXIT_FAILURE);
-	data->cl.command_queue = clCreateCommandQueue(data->cl.context, data->cl.device, 0, &error_code);
-	if (error_code != CL_SUCCESS)
-		return (EXIT_FAILURE);
-	data->cl.cl_screen = clCreateBuffer(data->cl.context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, WIDTH * HEIGHT * sizeof(int), data->mlx.mlx_screen, &error_code);
-	if (error_code != CL_SUCCESS)
-		return (EXIT_FAILURE);
-	if (init_opencl_kernels(data) != EXIT_SUCCESS)
-		return (EXIT_FAILURE);
+	if (ft_strcmp(name, arg_info->name) != 0)
+		return (printf("Expected argument %u to be \"%s\" but got \"%s\".\n", arg_info->index, arg_info->name, name), free(name), EXIT_FAILURE);
+	if (get_kernel_arg_info(kernel->kernel, arg_info->index, CL_KERNEL_ARG_TYPE_NAME, (void **)&type) != EXIT_SUCCESS)
+		return (free(name), EXIT_FAILURE);
+	if (ft_strcmp(type, arg_info->type) != 0)
+		return (printf("Expected argument %u's type to be \"%s\" but got \"%s\".\n", arg_info->index, arg_info->type, type), free(name), free(type), EXIT_FAILURE);
+	if (get_kernel_arg_info(kernel->kernel, arg_info->index, CL_KERNEL_ARG_ADDRESS_QUALIFIER, (void **)&qualifier) != EXIT_SUCCESS)
+		return (free(name), free(type), EXIT_FAILURE);
+	if (*qualifier != arg_info->qualifier)
+		return (printf("Expected argument %u's type qualifier to be \"%u\" but got \"%u\".\n", arg_info->index, arg_info->qualifier, *qualifier), free(name), free(type), free(qualifier), EXIT_FAILURE);
+	printf("\t> %-10s %-15s\n", type, name);
+	free(name);
+	free(type);
+	free(qualifier);
 	return (EXIT_SUCCESS);
 }
 
@@ -698,6 +421,7 @@ int	main(void)
 		return (cleanup_opencl(&data), EXIT_FAILURE);
 	if (prime_kernel_args(&data) != EXIT_SUCCESS)
 		return (cleanup_opencl(&data), EXIT_FAILURE);
+	mlx_set_font(data.mlx.mlx, data.mlx.window, "-*-*-r-normal-*-12-120-*-*-*-*-*-*");
 	mlx_loop_hook(data.mlx.mlx, loop, &data);
 	mlx_key_hook(data.mlx.window, handle_keys, &data);
 	mlx_mouse_hook(data.mlx.window, handle_mouse, &data);

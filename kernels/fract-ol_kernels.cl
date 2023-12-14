@@ -46,8 +46,6 @@ inline int	f(
 	return (color);
 }
 
-
-
 __kernel void	cl__compute_pixel(
 					__global int *screen,
 					double dx,
