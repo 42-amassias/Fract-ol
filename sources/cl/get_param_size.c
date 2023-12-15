@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   build_kernels.c                                    :+:      :+:    :+:   */
+/*   get_param_size.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/14 21:01:34 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 13:23:48 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/15 12:59:58 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/15 13:16:33 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,12 @@
 
 /* ************************************************************************** */
 /*                                                                            */
-/* Helper prototypes                                                          */
+/* Helper protoypes                                                           */
 /*                                                                            */
 /* ************************************************************************** */
 
-static char	*_get_next_name(
-				const char *name_list);
+static int	_is_type_ptr(
+				const char *type);
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -35,32 +35,26 @@ static char	*_get_next_name(
 /*                                                                            */
 /* ************************************************************************** */
 
-int	build_kernels(
-		t_cl *cl)
+int	get_param_size(
+		const char *type,
+		size_t *size,
+		t_cl_arg_type *internal_type)
 {
-	size_t		i;
-	cl_int		error_code;
-	char		*name;
-	t_kernel	*kernel;
+	size_t	i;
 
-	name = cl->_kernel_names;
+	if (_is_type_ptr(type))
+		type = "pointer";
 	i = 0;
-	while (i < cl->kernel_count)
+	while (i < CL_ARG_TYPE_COUNT)
 	{
-		kernel = &cl->kernels[i++];
-		kernel->name = name;
-		kernel->_arg_values = NULL;
-		kernel->kernel = clCreateKernel(
-				cl->program,
-				kernel->name,
-				&error_code);
-		if (error_code != CL_SUCCESS || build_kernel(kernel) != EXIT_SUCCESS)
-		{
-			ft_printf("Failed to build kernel \"%s\"\n", kernel->name);
-			return (cleanup_kernels(cl, i - 1), EXIT_FAILURE);
-		}
-		name = _get_next_name(name);
+		if (ft_strcmp(type, g_cl_types[i].str_type) == 0)
+			break ;
+		++i;
 	}
+	if (i == CL_ARG_TYPE_COUNT)
+		return (EXIT_FAILURE);
+	*size = g_cl_types[i].size;
+	*internal_type = g_cl_types[i].internal_type;
 	return (EXIT_SUCCESS);
 }
 
@@ -70,11 +64,11 @@ int	build_kernels(
 /*                                                                            */
 /* ************************************************************************** */
 
-static char	*_get_next_name(
-				const char *name_list)
+// `type` cannot be an empty string, so taking `type[len(type) - 2]` is ok !
+static int	_is_type_ptr(
+				const char *type)
 {
-	while (*name_list)
-		++name_list;
-	++name_list;
-	return ((char *) name_list);
+	while (*type)
+		++type;
+	return (type[-1] == '*');
 }

@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/06 15:23:11 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/14 21:16:42 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/15 13:30:18 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,56 +224,20 @@ int	loop(
 			NULL, global_work_size, NULL,
 			0, NULL, NULL);
 	if (error_code != CL_SUCCESS)
-		return (kill_program(EXIT_FAILURE, ERROR__KERNEL_START, data));
+		return (mlx_loop_end(data->mlx.mlx));
 	error_code = clEnqueueReadBuffer(
 			data->cl.command_queue,
 			data->cl.cl_screen, CL_TRUE,
 			0, WIDTH * HEIGHT * sizeof(int), data->mlx.mlx_screen,
 			0, NULL, NULL);
 	if (error_code != CL_SUCCESS)
-		return (kill_program(EXIT_FAILURE, ERROR__KERNEL_BUFFER_READ, data));
+		return (mlx_loop_end(data->mlx.mlx));
 	mlx_put_image_to_window(
 		data->mlx.mlx, data->mlx.window,
 		data->mlx.img, 0, 0);
 	if (param_str_buffer != NULL)
 		mlx_string_put(data->mlx.mlx, data->mlx.window, 100, 100, 0xFFFFFF, param_str_buffer);
 	return (0);
-}
-
-int	read_file(
-		const char *file_path,
-		char **file_buffer_ptr,
-		size_t *file_size)
-{
-	FILE	*file;
-
-	file = fopen(file_path, "rb");
-	if (file == NULL)
-		return (EXIT_FAILURE);
-	fseek(file, 0, SEEK_END);
-	*file_size = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	*file_buffer_ptr = (char *) malloc(*file_size + 1);
-	if (*file_buffer_ptr == NULL)
-		return (EXIT_FAILURE);
-	if (fread(*file_buffer_ptr, 1, *file_size, file) != *file_size)
-		return (free(*file_buffer_ptr), EXIT_FAILURE);
-	(*file_buffer_ptr)[*file_size] = '\0';
-	fclose(file);
-	return (EXIT_SUCCESS);
-}
-
-// TODO: cleanup ALL the loaded kernels.
-void	cleanup_opencl(
-			t_data *data)
-{
-	clReleaseMemObject(data->cl.cl_screen);
-	cleanup_kernels(data, data->cl.kernel_count);
-	clReleaseProgram(data->cl.program);
-	clReleaseCommandQueue(data->cl.command_queue);
-	clReleaseContext(data->cl.context);
-	clReleaseDevice(data->cl.device);
-	free(data->cl.platform);
 }
 
 void	cleanup_mlx(
@@ -291,7 +255,7 @@ void	cleanup_mlx(
 void	full_cleanup(
 			t_data *data)
 {
-	cleanup_opencl(data);
+	cleanup_opencl(&data->cl);
 	cleanup_mlx(data);
 }
 
@@ -314,95 +278,6 @@ int	prime_kernel_args(
 	return (EXIT_SUCCESS);
 }
 
-void	parse_kernel_names(
-			char *name_list)
-{
-	while (*name_list)
-	{
-		if (*name_list == ';')
-			*name_list = '\0';
-		++name_list;
-	}
-}
-
-// `type` cannot be an empty string, so taking `type[len(type) - 2]` is ok !
-int	is_type_ptr(
-		const char *type)
-{
-	while (*type)
-		++type;
-	return (type[-1] == '*');
-}
-
-int	get_param_size(
-		const char *type,
-		size_t *size,
-		t_cl_arg_type *internal_type)
-{
-	size_t	i;
-
-	if (is_type_ptr(type))
-		type = "pointer";
-	i = 0;
-	while (i < CL_ARG_TYPE_COUNT)
-	{
-		if (ft_strcmp(type, g_cl_types[i].str_type) == 0)
-			break ;
-		++i;
-	}
-	if (i == CL_ARG_TYPE_COUNT)
-		return (EXIT_FAILURE);
-	*size = g_cl_types[i].size;
-	*internal_type = g_cl_types[i].internal_type;
-	return (EXIT_SUCCESS);
-}
-
-int	get_kernel_arg_info(
-		cl_kernel kernel,
-		cl_uint index,
-		cl_kernel_arg_info info,
-		void **buffer_ptr)
-{
-	size_t	size;
-
-	if (clGetKernelArgInfo(kernel, index, info, 0, NULL, &size) != CL_SUCCESS)
-		return (EXIT_FAILURE);
-	*buffer_ptr = (void *) malloc(size);
-	if (*buffer_ptr == NULL)
-		return (EXIT_FAILURE);
-	if (clGetKernelArgInfo(kernel, index,
-			info, size, *buffer_ptr, NULL) != CL_SUCCESS)
-		return (free(*buffer_ptr), EXIT_FAILURE);
-	return (EXIT_SUCCESS);
-}
-
-int	check_special_argument(
-	const t_kernel *kernel,
-	const t_arg_info *arg_info)
-{
-	cl_kernel_arg_access_qualifier	*qualifier;
-	char							*name;
-	char							*type;
-
-	if (get_kernel_arg_info(kernel->kernel, arg_info->index, CL_KERNEL_ARG_NAME, (void **)&name) != EXIT_SUCCESS)
-		return (EXIT_FAILURE);
-	if (ft_strcmp(name, arg_info->name) != 0)
-		return (printf("Expected argument %u to be \"%s\" but got \"%s\".\n", arg_info->index, arg_info->name, name), free(name), EXIT_FAILURE);
-	if (get_kernel_arg_info(kernel->kernel, arg_info->index, CL_KERNEL_ARG_TYPE_NAME, (void **)&type) != EXIT_SUCCESS)
-		return (free(name), EXIT_FAILURE);
-	if (ft_strcmp(type, arg_info->type) != 0)
-		return (printf("Expected argument %u's type to be \"%s\" but got \"%s\".\n", arg_info->index, arg_info->type, type), free(name), free(type), EXIT_FAILURE);
-	if (get_kernel_arg_info(kernel->kernel, arg_info->index, CL_KERNEL_ARG_ADDRESS_QUALIFIER, (void **)&qualifier) != EXIT_SUCCESS)
-		return (free(name), free(type), EXIT_FAILURE);
-	if (*qualifier != arg_info->qualifier)
-		return (printf("Expected argument %u's type qualifier to be \"%u\" but got \"%u\".\n", arg_info->index, arg_info->qualifier, *qualifier), free(name), free(type), free(qualifier), EXIT_FAILURE);
-	printf("\t> %-10s %-15s\n", type, name);
-	free(name);
-	free(type);
-	free(qualifier);
-	return (EXIT_SUCCESS);
-}
-
 int	main(void)
 {
 	int				_;
@@ -417,10 +292,10 @@ int	main(void)
 	data.mlx.window = mlx_new_window(data.mlx.mlx, WIDTH, HEIGHT, "fract-ol");
 	data.mlx.img = mlx_new_image(data.mlx.mlx, WIDTH, HEIGHT);
 	data.mlx.mlx_screen = mlx_get_data_addr(data.mlx.img, &_, &_, &_);
-	if (init_opencl(&data) != EXIT_SUCCESS)
-		return (cleanup_opencl(&data), EXIT_FAILURE);
+	if (init_opencl(&data.cl, data.mlx.mlx_screen, WIDTH * HEIGHT))
+		return (cleanup_opencl(&data.cl), EXIT_FAILURE);
 	if (prime_kernel_args(&data) != EXIT_SUCCESS)
-		return (cleanup_opencl(&data), EXIT_FAILURE);
+		return (cleanup_opencl(&data.cl), EXIT_FAILURE);
 	mlx_set_font(data.mlx.mlx, data.mlx.window, "-*-*-r-normal-*-12-120-*-*-*-*-*-*");
 	mlx_loop_hook(data.mlx.mlx, loop, &data);
 	mlx_key_hook(data.mlx.window, handle_keys, &data);

@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 20:32:13 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/14 21:42:58 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/15 13:28:00 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,10 @@
 /* ************************************************************************** */
 
 #include "opencl.h"
+
+#include "libft.h"
+
+#include "utils.h"
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -46,6 +50,9 @@ static int	_build_program(
 static int	_query_infos(
 				t_cl *cl);
 
+static void	parse_kernel_names(
+				char *name_list);
+
 /* ************************************************************************** */
 /*                                                                            */
 /* Header implementation                                                      */
@@ -55,17 +62,13 @@ static int	_query_infos(
 int	init_opencl_kernels(
 		t_cl *cl)
 {
-	cl_int	error_code;
-	size_t	program_size;
-	char	*program;
-
 	if (_create_program(cl) != EXIT_SUCCESS)
 		return (EXIT_FAILURE);
 	if (_build_program(cl) != EXIT_SUCCESS)
 		return (EXIT_FAILURE);
 	if (_query_infos(cl) != EXIT_SUCCESS)
 		return (EXIT_FAILURE);
-	printf("Kernel names: %s\n", cl->_kernel_names);
+	ft_printf("Kernel names: %s\n", cl->_kernel_names);
 	parse_kernel_names(cl->_kernel_names);
 	cl->kernels = (t_kernel *)
 		malloc(cl->kernel_count * sizeof(t_kernel));
@@ -151,4 +154,15 @@ static int	_query_infos(
 	if (error_code != CL_SUCCESS)
 		return (free(cl->_kernel_names), EXIT_FAILURE);
 	return (EXIT_SUCCESS);
+}
+
+static void	parse_kernel_names(
+				char *name_list)
+{
+	while (*name_list)
+	{
+		if (*name_list == ';')
+			*name_list = '\0';
+		++name_list;
+	}
 }

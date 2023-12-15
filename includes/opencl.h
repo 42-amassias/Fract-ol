@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 18:14:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/14 21:46:54 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/15 13:31:49 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,9 +107,18 @@ int		build_kernels(
 int		build_kernel(
 			t_kernel *kernel);
 
+int		get_param_size(
+			const char *type,
+			size_t *size,
+			t_cl_arg_type *internal_type);
+
 void	cleanup_kernels(
 			t_cl *cl,
 			size_t count);
+
+// TODO: cleanup kernels
+void	cleanup_opencl(
+			t_cl *cl);
 
 int		cl_get_kernel_info__int(
 			cl_kernel kernel,

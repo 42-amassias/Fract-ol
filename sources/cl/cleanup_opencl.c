@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleanup_kernels.c                                  :+:      :+:    :+:   */
+/*   cleanup_opencl.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/14 21:13:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 13:01:36 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/15 13:18:44 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/15 13:19:21 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,21 +24,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-void	cleanup_kernels(
-			t_cl *cl,
-			size_t count)
+void	cleanup_opencl(
+			t_cl *cl)
 {
-	t_kernel	*kernel;
-
-	while (count-- > 0)
-	{
-		kernel = &cl->kernels[count];
-		while (kernel->arg_count-- > 0)
-			free((void *)kernel->args[kernel->arg_count].name);
-		free((void *)kernel->args);
-		free((void *)kernel->name);
-		free((void *)kernel->_arg_values);
-		clReleaseKernel(kernel->kernel);
-	}
-	free((void *)cl->kernels);
+	clReleaseMemObject(cl->cl_screen);
+	cleanup_kernels(cl, cl->kernel_count);
+	clReleaseProgram(cl->program);
+	clReleaseCommandQueue(cl->command_queue);
+	clReleaseContext(cl->context);
+	clReleaseDevice(cl->device);
+	free(cl->platform);
 }

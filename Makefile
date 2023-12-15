@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2023/12/14 21:35:08 by amassias         ###   ########.fr        #
+#    Updated: 2023/12/15 13:28:22 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -58,10 +58,13 @@ FILES			:=		\
 	cl/build_kernel		\
 	cl/build_kernels	\
 	cl/cleanup_kernels	\
+	cl/cleanup_opencl	\
+	cl/get_param_size	\
 	cl/init_kernels		\
 	cl/init_opencl		\
 	cl/kernel_arg_info	\
 	cl/kernel_info		\
+	utils/read_file		\
 
 SRCS			:=	$(addprefix $(SRC_DIR)/,$(addsuffix .c,$(FILES)))
 
