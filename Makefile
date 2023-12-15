@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2023/12/15 13:28:22 by amassias         ###   ########.fr        #
+#    Updated: 2023/12/15 18:25:32 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,7 +44,9 @@ CFLAGS			:=					\
 LFLAGS			:=					\
 	-L$(LIB_FT_PATH)				\
 	-L$(LIB_MLX_PATH)				\
-	-lftfull -lOpenCL -lmlx -lXext -lX11 -lm -lz
+	-lftfull						\
+	-lmlx -lXext -lX11 -lm -lz		\
+	-lOpenCL 						\
 
 # **************************************************************************** #
 #                                                                              #
@@ -64,6 +66,8 @@ FILES			:=		\
 	cl/init_opencl		\
 	cl/kernel_arg_info	\
 	cl/kernel_info		\
+	mlx/cleanup_mlx		\
+	mlx/init_mlx		\
 	utils/read_file		\
 
 SRCS			:=	$(addprefix $(SRC_DIR)/,$(addsuffix .c,$(FILES)))
@@ -76,7 +80,7 @@ OBJS			:=	$(addprefix $(BIN_DIR)/,$(addsuffix .o,$(FILES)))
 #                                                                              #
 # **************************************************************************** #
 
-.PHONY: all clean fclean re cleanlibs fcleanlibs
+.PHONY: all clean fclean re cleanlibs fcleanlibs norminette
 
 all: $(NAME)
 
@@ -95,6 +99,14 @@ fcleanlibs:
 	$(MAKE) clean -C $(LIB_MLX_PATH)
 
 re:	fclean all
+
+# TODO: Eventually remove the restriction on `main.c`.
+norminette:
+	@norminette														\
+		`find $(SRC_DIR) -type f -name \*.c -and -not -name main.c`	\
+		`find $(INC_DIR) -type f -name \*.h`						\
+		| grep -Ev '^Notice: |OK\!$$'								\
+		&& exit 1 || printf 'Norminette OK!\n' && exit 0
 
 # **************************************************************************** #
 #                                                                              #

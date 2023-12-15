@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 20:32:13 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 13:28:00 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/15 17:19:38 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 #include "opencl.h"
 
-#include "libft.h"
+#include <libft.h>
 
 #include "utils.h"
 
@@ -76,7 +76,7 @@ int	init_opencl_kernels(
 		return (EXIT_FAILURE);
 	if (build_kernels(cl) != EXIT_SUCCESS)
 		return (EXIT_FAILURE);
-	cl->kernel = cl->kernels;
+	cl->current_kernel = cl->kernels;
 	return (EXIT_SUCCESS);
 }
 

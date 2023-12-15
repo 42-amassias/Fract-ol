@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 21:01:34 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 13:31:29 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/15 19:07:37 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 #include "opencl.h"
 
-#include "libft.h"
+#include <libft.h>
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -75,7 +75,7 @@ int	build_kernel(
 	i = 0;
 	arg_buffer_size = 0;
 	while (i < kernel->arg_count)
-		arg_buffer_size = kernel->args[i++].size;
+		arg_buffer_size += kernel->args[i++].size;
 	kernel->_arg_values = (char *) ft_calloc(1, arg_buffer_size);
 	if (kernel->_arg_values == NULL)
 		return (_cleanup_kernel_args(kernel->args, kernel->arg_count),
@@ -99,16 +99,18 @@ int	build_kernel(
 static int	_get_argument_count_and_verify_mandatory_arguments(
 				t_kernel *kernel)
 {
+	size_t	i;
+
 	if (cl_get_kernel_info__int(
 			kernel->kernel, CL_KERNEL_NUM_ARGS, &kernel->arg_count))
 		return (EXIT_FAILURE);
-	if (kernel->arg_count < 3)
+	if (kernel->arg_count < CL_KERNEL_NEEDED_ARG_COUNT)
 		return (ft_printf(MISSING_ARGUMENTS_ERROR_MESSAGE), EXIT_FAILURE);
-	kernel->arg_count -= 3;
-	if (_check_special_argument(kernel, &g_needed_kernel_args[0])
-		|| _check_special_argument(kernel, &g_needed_kernel_args[1])
-		|| _check_special_argument(kernel, &g_needed_kernel_args[2]))
-		return (EXIT_FAILURE);
+	kernel->arg_count -= CL_KERNEL_NEEDED_ARG_COUNT;
+	i = 0;
+	while (i < CL_KERNEL_NEEDED_ARG_COUNT)
+		if (_check_special_argument(kernel, &g_needed_kernel_args[i++]))
+			return (EXIT_FAILURE);
 	kernel->args = (t_kernel_arg *)
 		malloc(kernel->arg_count * sizeof(t_kernel_arg));
 	if (kernel->args == NULL)
@@ -155,10 +157,12 @@ static int	_query_arguments(
 	i = 0;
 	while (i < kernel->arg_count)
 	{
-		if (cl_get_kernel_arg_info__str(kernel->kernel, i + 3,
+		if (cl_get_kernel_arg_info__str(
+				kernel->kernel, i + CL_KERNEL_NEEDED_ARG_COUNT,
 				CL_KERNEL_ARG_NAME, (void **)&kernel->args[i].name))
 			return (_cleanup_kernel_args(kernel->args, i), EXIT_FAILURE);
-		if (cl_get_kernel_arg_info__str(kernel->kernel, i + 3,
+		if (cl_get_kernel_arg_info__str(
+				kernel->kernel, i + CL_KERNEL_NEEDED_ARG_COUNT,
 				CL_KERNEL_ARG_TYPE_NAME, (void **)&type))
 			return (free((char *)kernel->name),
 				_cleanup_kernel_args(kernel->args, i), EXIT_FAILURE);
@@ -166,6 +170,7 @@ static int	_query_arguments(
 			return (ft_printf(ERROR_SUPPORT_TYPE, type),
 				free((char *)kernel->name), free(type),
 				_cleanup_kernel_args(kernel->args, i), EXIT_FAILURE);
+		free(type);
 		++i;
 	}
 	return (EXIT_SUCCESS);

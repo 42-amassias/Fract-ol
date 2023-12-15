@@ -1,14 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_param_size.c                                   :+:      :+:    :+:   */
+/*   mlx_wrapper.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/15 12:59:58 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 13:16:33 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/15 14:00:38 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/15 16:09:18 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#ifndef MLX_WRAPPER_H
+# define MLX_WRAPPER_H
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -16,59 +19,71 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opencl.h"
-
-#include <libft.h>
+# include <mlx.h>
 
 /* ************************************************************************** */
 /*                                                                            */
-/* Helper protoypes                                                           */
+/* Defines                                                                    */
 /*                                                                            */
 /* ************************************************************************** */
 
-static int	_is_type_ptr(
-				const char *type);
+# define WINDOW_TITLE "fract-ol"
+
+# define WINDOW_X_FONT "-*-*-r-normal-*-12-120-*-*-*-*-*-*"
 
 /* ************************************************************************** */
 /*                                                                            */
-/* Header implementation                                                      */
+/* Structures                                                                 */
 /*                                                                            */
 /* ************************************************************************** */
 
-int	get_param_size(
-		const char *type,
-		size_t *size,
-		t_cl_arg_type *internal_type)
+struct	s_handlers
 {
-	size_t	i;
-
-	if (_is_type_ptr(type))
-		type = "pointer";
-	i = 0;
-	while (i < CL_ARG_TYPE_COUNT)
+	int		(*update)(void *);
+	int		(*render)(void *);
+	int		(*mouse)(int, int, int, void *);
+	int		(*keyboard)(int, void *);
+	struct s_context
 	{
-		if (ft_strcmp(type, g_cl_types[i].str_type) == 0)
-			break ;
-		++i;
-	}
-	if (i == CL_ARG_TYPE_COUNT)
-		return (EXIT_FAILURE);
-	*size = g_cl_types[i].size;
-	*internal_type = g_cl_types[i].internal_type;
-	return (EXIT_SUCCESS);
-}
+		void	*update;
+		void	*render;
+		void	*mouse;
+		void	*keyboard;
+	}	context;
+};
 
-/* ************************************************************************** */
-/*                                                                            */
-/* Helper implementation                                                      */
-/*                                                                            */
-/* ************************************************************************** */
-
-// `type` cannot be an empty string, so taking `type[len(type) - 2]` is ok !
-static int	_is_type_ptr(
-				const char *type)
+struct s_mlx
 {
-	while (*type)
-		++type;
-	return (type[-1] == '*');
-}
+	void				*mlx;
+	void				*window;
+	void				*img;
+	char				*screen;
+	struct s_handlers	handlers;
+};
+
+/* ************************************************************************** */
+/*                                                                            */
+/* Types                                                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
+typedef struct s_mlx		t_mlx;
+
+typedef struct s_handlers	t_handlers;
+
+/* ************************************************************************** */
+/*                                                                            */
+/* header protoypes                                                           */
+/*                                                                            */
+/* ************************************************************************** */
+
+int		init_mlx(
+			t_mlx *mlx,
+			unsigned int width,
+			unsigned int height,
+			t_handlers *handlers);
+
+void	cleanup_mlx(
+			t_mlx *mlx);
+
+#endif

@@ -50,9 +50,9 @@ __kernel void	cl__compute_pixel(
 					__global int *screen,
 					double dx,
 					double dy,
+					double zoom,
 					int max_itr,
-					double k,
-					double zoom
+					double k
 					)
 {
 	int		i;

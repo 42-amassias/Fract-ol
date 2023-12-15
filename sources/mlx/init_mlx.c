@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_param_size.c                                   :+:      :+:    :+:   */
+/*   init_mlx.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/15 12:59:58 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 13:16:33 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/15 13:56:57 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/15 17:10:17 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opencl.h"
+#include "mlx_wrapper.h"
 
 #include <libft.h>
 
@@ -26,8 +26,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-static int	_is_type_ptr(
-				const char *type);
+static int	_loop(
+				t_mlx *mlx);
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -35,26 +35,31 @@ static int	_is_type_ptr(
 /*                                                                            */
 /* ************************************************************************** */
 
-int	get_param_size(
-		const char *type,
-		size_t *size,
-		t_cl_arg_type *internal_type)
+int	init_mlx(
+		t_mlx *mlx,
+		unsigned int width,
+		unsigned int height,
+		t_handlers *handlers)
 {
-	size_t	i;
+	int	_;
 
-	if (_is_type_ptr(type))
-		type = "pointer";
-	i = 0;
-	while (i < CL_ARG_TYPE_COUNT)
-	{
-		if (ft_strcmp(type, g_cl_types[i].str_type) == 0)
-			break ;
-		++i;
-	}
-	if (i == CL_ARG_TYPE_COUNT)
-		return (EXIT_FAILURE);
-	*size = g_cl_types[i].size;
-	*internal_type = g_cl_types[i].internal_type;
+	ft_memset(mlx, 0, sizeof(t_mlx));
+	ft_memcpy(&mlx->handlers, handlers, sizeof(t_handlers));
+	mlx->mlx = mlx_init();
+	if (mlx->mlx == NULL)
+		return (cleanup_mlx(mlx), EXIT_FAILURE);
+	mlx->window = mlx_new_window(mlx->mlx, width, height, WINDOW_TITLE);
+	if (mlx->window == NULL)
+		return (cleanup_mlx(mlx), EXIT_FAILURE);
+	mlx->img = mlx_new_image(mlx->mlx, width, height);
+	if (mlx->img == NULL)
+		return (cleanup_mlx(mlx), EXIT_FAILURE);
+	mlx->screen = mlx_get_data_addr(mlx->img, &_, &_, &_);
+	mlx_loop_hook(mlx->mlx, _loop, mlx);
+	mlx_expose_hook(mlx->window, handlers->render, handlers->context.render);
+	mlx_key_hook(mlx->window, handlers->keyboard, handlers->context.keyboard);
+	mlx_mouse_hook(mlx->window, handlers->mouse, handlers->context.mouse);
+	mlx_set_font(mlx->mlx, mlx->window, WINDOW_X_FONT);
 	return (EXIT_SUCCESS);
 }
 
@@ -64,11 +69,12 @@ int	get_param_size(
 /*                                                                            */
 /* ************************************************************************** */
 
-// `type` cannot be an empty string, so taking `type[len(type) - 2]` is ok !
-static int	_is_type_ptr(
-				const char *type)
+static int	_loop(
+				t_mlx *mlx)
 {
-	while (*type)
-		++type;
-	return (type[-1] == '*');
+	if (mlx->handlers.update(mlx->handlers.context.update))
+		return (EXIT_FAILURE);
+	if (mlx->handlers.render(mlx->handlers.context.render))
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }

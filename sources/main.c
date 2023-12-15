@@ -6,12 +6,13 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/06 15:23:11 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 13:30:18 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/15 18:27:16 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fractol.h"
 #include "opencl.h"
+#include "mlx_wrapper.h"
 
 #include <X11/Xlib.h>
 
@@ -110,67 +111,64 @@ char	*get_arg_as_string(
 
 int	handle_keys(
 		int keycode,
-		t_data *data)
+		t_fractol *fractol)
 {
 	if (keycode == 'p')
 	{
 		size_t			i;
-		// size_t			len;
 		char			*tmp;
-		// char			*v;
 		static size_t	size;
 		char			*padd;
 
-		if (param_str_buffer == NULL)
+		if (param_str_buffer != NULL)
+			free(param_str_buffer);
+		i = 0;
+		size = 0;
+		param_str_buffer = malloc(1);
+		param_str_buffer[0] = '\0';
+		while (i < fractol->cl.current_kernel->arg_count)
 		{
-			i = 0;
-			size = 0;
-			param_str_buffer = malloc(1);
-			param_str_buffer[0] = '\0';
-			while (i < data->cl.kernel->arg_count)
-			{
-				padd = ft_strdup("               ");
-				ft_memcpy(padd, data->cl.kernel->args[i].name, ft_strlen(data->cl.kernel->args[i].name));
-				tmp = ft_strcat(param_str_buffer, padd);
-				free(padd);
-				free(param_str_buffer);
-				param_str_buffer = tmp;
-				tmp = ft_strcat(param_str_buffer, " : ");
-				free(param_str_buffer);
-				param_str_buffer = tmp;
-				padd = malloc(128);
-				if (data->cl.kernel->args[i].type == CL_ARG_TYPE__DOUBLE)
-					sprintf(padd, "%lf\n", *(cl_double *)data->cl.kernel->args[i].value);
-				else if (data->cl.kernel->args[i].type == CL_ARG_TYPE__INT)
-					sprintf(padd, "%d\n", *(cl_int *)data->cl.kernel->args[i].value);
-				else
-					sprintf(padd, "x\n");
-				tmp = ft_strcat(param_str_buffer, padd);
-				free(padd);
-				free(param_str_buffer);
-				param_str_buffer = tmp;
-				++i;
-			}
+			padd = ft_strdup("               ");
+			ft_memcpy(padd, fractol->cl.current_kernel->args[i].name, ft_strlen(fractol->cl.current_kernel->args[i].name));
+			tmp = ft_strcat(param_str_buffer, padd);
+			free(padd);
+			free(param_str_buffer);
+			param_str_buffer = tmp;
+			tmp = ft_strcat(param_str_buffer, " : ");
+			free(param_str_buffer);
+			param_str_buffer = tmp;
+			padd = malloc(128);
+			if (fractol->cl.current_kernel->args[i].type == CL_ARG_TYPE__DOUBLE)
+				sprintf(padd, "%lf\n", *(cl_double *)fractol->cl.current_kernel->args[i].value);
+			else if (fractol->cl.current_kernel->args[i].type == CL_ARG_TYPE__INT)
+				sprintf(padd, "%d\n", *(cl_int *)fractol->cl.current_kernel->args[i].value);
+			else
+				sprintf(padd, "x\n");
+			tmp = ft_strcat(param_str_buffer, padd);
+			free(padd);
+			free(param_str_buffer);
+			param_str_buffer = tmp;
+			++i;
 		}
 	}
 	else if (keycode == 'q')
-		mlx_loop_end(data->mlx.mlx);
+		mlx_loop_end(fractol->mlx.mlx);
 	else if (keycode == 'i')
 		change_parameter__int(
-			&data->params.max_itr, "MAX_ITR",
-			data->cl.kernel->kernel, KERNEL_ARG_INDEX__MAX_ITR);
+			&fractol->params.max_itr, "MAX_ITR",
+			fractol->cl.current_kernel->kernel, 4);
 	else if (keycode == 'k')
 		change_parameter__double(
-			&data->params.k, "K",
-			data->cl.kernel->kernel, KERNEL_ARG_INDEX__K);
+			&fractol->params.k, "K",
+			fractol->cl.current_kernel->kernel, 5);
 	else if (keycode == 'x')
 		change_parameter__double(
-			&data->params.dx, "x",
-			data->cl.kernel->kernel, KERNEL_ARG_INDEX__DX);
+			&fractol->params.dx, "x",
+			fractol->cl.current_kernel->kernel, KERNEL_ARG_INDEX__DX);
 	else if (keycode == 'y')
 		change_parameter__double(
-			&data->params.dy, "y",
-			data->cl.kernel->kernel, KERNEL_ARG_INDEX__DY);
+			&fractol->params.dy, "y",
+			fractol->cl.current_kernel->kernel, KERNEL_ARG_INDEX__DY);
 	return (0);
 }
 
@@ -178,129 +176,147 @@ int	handle_mouse(
 		int button,
 		int x,
 		int y,
-		t_data *data)
+		t_fractol *fractol)
 {
 	if (button == 1)
 	{
-		data->params.dx += ((double)WIDTH / (double)HEIGHT)
+		fractol->params.dx += ((double)WIDTH / (double)HEIGHT)
 			* (((double)(4 * x) / (double)(WIDTH - 1)) - 2.)
-			/ data->params.zoom;
-		data->params.dy += (((double)(4 * y) / (double)(HEIGHT - 1)) - 2.)
-			/ data->params.zoom;
+			/ fractol->params.zoom;
+		fractol->params.dy += (((double)(4 * y) / (double)(HEIGHT - 1)) - 2.)
+			/ fractol->params.zoom;
 		set_kernel_arg__double(
-			data->cl.kernel->kernel, KERNEL_ARG_INDEX__DX, data->params.dx);
+			fractol->cl.current_kernel->kernel, KERNEL_ARG_INDEX__DX, fractol->params.dx);
 		set_kernel_arg__double(
-			data->cl.kernel->kernel, KERNEL_ARG_INDEX__DY, data->params.dy);
+			fractol->cl.current_kernel->kernel, KERNEL_ARG_INDEX__DY, fractol->params.dy);
 	}
 	if (button == 4)
-		data->params.zoom *= 1.1;
+		fractol->params.zoom *= 1.1;
 	if (button == 5)
-		data->params.zoom /= 1.1;
+		fractol->params.zoom /= 1.1;
 	if (button == 4 || button == 5)
-		set_kernel_arg__double(
-			data->cl.kernel->kernel, KERNEL_ARG_INDEX__ZOOM, data->params.zoom);
+		set_kernel_arg__double(fractol->cl.current_kernel->kernel, KERNEL_ARG_INDEX__ZOOM, fractol->params.zoom);
 	return (0);
 }
 
 int	kill_program(
 			int code,
 			const char *message,
-			t_data *data)
+			t_fractol *fractol)
 {
-	data->error.code = code;
-	data->error.message = message;
-	mlx_loop_end(data->mlx.mlx);
+	fractol->error.code = code;
+	fractol->error.message = message;
+	mlx_loop_end(fractol->mlx.mlx);
 	return (code);
 }
 
-int	loop(
-		t_data *data)
+int update(
+		t_fractol *fractol)
+{
+	(void) fractol;
+	return (EXIT_SUCCESS);
+}
+
+
+int	render(
+		t_fractol *fractol)
 {
 	static const size_t	global_work_size[] = {WIDTH, HEIGHT};
 	cl_int				error_code;
 
 	error_code = clEnqueueNDRangeKernel(
-			data->cl.command_queue, data->cl.kernel->kernel, 2,
+			fractol->cl.command_queue, fractol->cl.current_kernel->kernel, 2,
 			NULL, global_work_size, NULL,
 			0, NULL, NULL);
 	if (error_code != CL_SUCCESS)
-		return (mlx_loop_end(data->mlx.mlx));
+		return (mlx_loop_end(fractol->mlx.mlx));
 	error_code = clEnqueueReadBuffer(
-			data->cl.command_queue,
-			data->cl.cl_screen, CL_TRUE,
-			0, WIDTH * HEIGHT * sizeof(int), data->mlx.mlx_screen,
+			fractol->cl.command_queue,
+			fractol->cl.cl_screen, CL_TRUE,
+			0, WIDTH * HEIGHT * sizeof(int), fractol->mlx.screen,
 			0, NULL, NULL);
 	if (error_code != CL_SUCCESS)
-		return (mlx_loop_end(data->mlx.mlx));
+		return (mlx_loop_end(fractol->mlx.mlx));
 	mlx_put_image_to_window(
-		data->mlx.mlx, data->mlx.window,
-		data->mlx.img, 0, 0);
+		fractol->mlx.mlx, fractol->mlx.window,
+		fractol->mlx.img, 0, 0);
 	if (param_str_buffer != NULL)
-		mlx_string_put(data->mlx.mlx, data->mlx.window, 100, 100, 0xFFFFFF, param_str_buffer);
+		mlx_string_put(fractol->mlx.mlx, fractol->mlx.window, 100, 100, 0xFFFFFF, param_str_buffer);
 	return (0);
 }
 
-void	cleanup_mlx(
-			t_data *data)
-{
-	if (data->mlx.img != NULL)
-		mlx_destroy_image(data->mlx.mlx, data->mlx.img);
-	if (data->mlx.window != NULL)
-		mlx_destroy_window(data->mlx.mlx, data->mlx.window);
-	if (data->mlx.mlx != NULL)
-		mlx_destroy_display(data->mlx.mlx);
-	free(data->mlx.mlx);
-}
-
 void	full_cleanup(
-			t_data *data)
+			t_fractol *fractol)
 {
-	cleanup_opencl(&data->cl);
-	cleanup_mlx(data);
+	cleanup_opencl(&fractol->cl);
+	cleanup_mlx(&fractol->mlx);
 }
 
 int	prime_kernel_args(
-		t_data *data)
+		t_cl *cl,
+		double *dx,
+		double *dy,
+		double *itr)
 {
-	if (clSetKernelArg(data->cl.kernel->kernel, KERNEL_ARG_INDEX__BUFFER,
-			sizeof(cl_mem), &data->cl.cl_screen) != CL_SUCCESS
-		|| clSetKernelArg(data->cl.kernel->kernel, KERNEL_ARG_INDEX__MAX_ITR,
-			sizeof(cl_int), &data->params.max_itr) != CL_SUCCESS
-		|| clSetKernelArg(data->cl.kernel->kernel, KERNEL_ARG_INDEX__K,
-			sizeof(cl_double), &data->params.k) != CL_SUCCESS
-		|| clSetKernelArg(data->cl.kernel->kernel, KERNEL_ARG_INDEX__ZOOM,
-			sizeof(cl_double), &data->params.zoom) != CL_SUCCESS
-		|| clSetKernelArg(data->cl.kernel->kernel, KERNEL_ARG_INDEX__DX,
-			sizeof(cl_double), &data->params.dx) != CL_SUCCESS
-		|| clSetKernelArg(data->cl.kernel->kernel, KERNEL_ARG_INDEX__DY,
-			sizeof(cl_double), &data->params.dy) != CL_SUCCESS)
+	size_t			i;
+	t_kernel		*kernel;
+	t_kernel_arg	*arg;
+
+	kernel = cl->current_kernel;
+	if (clSetKernelArg(kernel->kernel, 0, sizeof(cl_mem), &cl->cl_screen))
 		return (EXIT_FAILURE);
+	if (clSetKernelArg(kernel->kernel, 1, sizeof(cl_double), dx))
+		return (EXIT_FAILURE);
+	if (clSetKernelArg(kernel->kernel, 2, sizeof(cl_double), dy))
+		return (EXIT_FAILURE);
+	if (clSetKernelArg(kernel->kernel, 3, sizeof(cl_double), itr))
+		return (EXIT_FAILURE);
+	i = 0;
+	arg = kernel->args;
+	while (i < kernel->arg_count)
+	{
+		if (clSetKernelArg(kernel->kernel, i + CL_KERNEL_NEEDED_ARG_COUNT, arg->size, arg->value))
+			return (EXIT_FAILURE);
+		++i;
+		++arg;
+	}
 	return (EXIT_SUCCESS);
+}
+
+void	create_handlers(
+			t_handlers *handlers,
+			t_fractol *fractol)
+{
+	handlers->update = (int (*)(void *))update;
+	handlers->context.update = fractol;
+	handlers->render = (int (*)(void *))render;
+	handlers->context.render = fractol;
+	handlers->keyboard = (int (*)(int, void *))handle_keys;
+	handlers->context.keyboard = fractol;
+	handlers->mouse = (int (*)(int, int, int, void *))handle_mouse;
+	handlers->context.mouse = fractol;
 }
 
 int	main(void)
 {
-	int				_;
-	static t_data	data = {0};
+	static t_fractol	fractol = {0};
+	static t_handlers	handlers = {0};
 
-	data.params.zoom = 1.;
-	data.params.k = log(2);
-	data.params.max_itr = 1024;
-	data.params.dx = -0.744567;
-	data.params.dy = 0.121201;
-	data.mlx.mlx = mlx_init();
-	data.mlx.window = mlx_new_window(data.mlx.mlx, WIDTH, HEIGHT, "fract-ol");
-	data.mlx.img = mlx_new_image(data.mlx.mlx, WIDTH, HEIGHT);
-	data.mlx.mlx_screen = mlx_get_data_addr(data.mlx.img, &_, &_, &_);
-	if (init_opencl(&data.cl, data.mlx.mlx_screen, WIDTH * HEIGHT))
-		return (cleanup_opencl(&data.cl), EXIT_FAILURE);
-	if (prime_kernel_args(&data) != EXIT_SUCCESS)
-		return (cleanup_opencl(&data.cl), EXIT_FAILURE);
-	mlx_set_font(data.mlx.mlx, data.mlx.window, "-*-*-r-normal-*-12-120-*-*-*-*-*-*");
-	mlx_loop_hook(data.mlx.mlx, loop, &data);
-	mlx_key_hook(data.mlx.window, handle_keys, &data);
-	mlx_mouse_hook(data.mlx.window, handle_mouse, &data);
-	mlx_loop(data.mlx.mlx);
-	full_cleanup(&data);
-	return (data.error.code);
+	fractol.params.dx = -0.744567;
+	fractol.params.dy = 0.121201;
+	fractol.params.zoom = 1.;
+	fractol.params.max_itr = 1024;
+	fractol.params.k = log(2);
+	create_handlers(&handlers, &fractol);
+	if (init_mlx(&fractol.mlx, WIDTH, HEIGHT, &handlers))
+		return (EXIT_FAILURE);
+	if (init_opencl(&fractol.cl, fractol.mlx.screen, WIDTH * HEIGHT))
+		return (cleanup_opencl(&fractol.cl), EXIT_FAILURE);
+	*(cl_int *)fractol.cl.current_kernel->args[0].value = 1024;
+	*(cl_double *)fractol.cl.current_kernel->args[1].value = log(2);
+	if (prime_kernel_args(&fractol.cl, &fractol.params.dx, &fractol.params.dy, &fractol.params.zoom) != EXIT_SUCCESS)
+		return (cleanup_opencl(&fractol.cl), EXIT_FAILURE);
+	mlx_loop(fractol.mlx.mlx);
+	full_cleanup(&fractol);
+	return (fractol.error.code);
 }

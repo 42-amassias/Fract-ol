@@ -6,29 +6,45 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 18:14:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 13:31:49 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/15 17:54:47 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef OPENCL_H
 # define OPENCL_H
 
+/* ************************************************************************** */
+/*                                                                            */
+/* Includes                                                                   */
+/*                                                                            */
+/* ************************************************************************** */
+
 # define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 # include <CL/cl.h>
+
+/* ************************************************************************** */
+/*                                                                            */
+/* Defines                                                                    */
+/*                                                                            */
+/* ************************************************************************** */
 
 # define LOG_SIZE 4096
 
 # define KERNEL_ARG_INDEX__BUFFER 0
 # define KERNEL_ARG_INDEX__DX 1
 # define KERNEL_ARG_INDEX__DY 2
-# define KERNEL_ARG_INDEX__MAX_ITR 3
-# define KERNEL_ARG_INDEX__K 4
-# define KERNEL_ARG_INDEX__ZOOM 5
+# define KERNEL_ARG_INDEX__ZOOM 3
 
 # define CL_TYPE_COUNT 10
-# define CL_KERNEL_NEEDED_ARG_COUNT 3
+# define CL_KERNEL_NEEDED_ARG_COUNT 4
 
-typedef enum e_cl_arg_type
+/* ************************************************************************** */
+/*                                                                            */
+/* Enums                                                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
+enum e_cl_arg_type
 {
 	CL_ARG_TYPE__CHAR,
 	CL_ARG_TYPE__SHORT,
@@ -41,41 +57,47 @@ typedef enum e_cl_arg_type
 	CL_ARG_TYPE__FLOAT,
 	CL_ARG_TYPE__DOUBLE,
 	CL_ARG_TYPE_COUNT,
-}	t_cl_arg_type;
+};
 
-typedef struct s_arg_info
+/* ************************************************************************** */
+/*                                                                            */
+/* Structures                                                                 */
+/*                                                                            */
+/* ************************************************************************** */
+
+struct s_arg_info
 {
 	cl_uint							index;
 	const char						*name;
 	const char						*type;
 	cl_kernel_arg_access_qualifier	qualifier;
-}	t_arg_info;
+};
 
-typedef struct s_cl_type
+struct s_cl_type
 {
-	const char		*str_type;
-	t_cl_arg_type	internal_type;
-	size_t			size;
-}	t_cl_type;
+	const char			*str_type;
+	enum e_cl_arg_type	internal_type;
+	size_t				size;
+};
 
-typedef struct s_kernel_arg
+struct s_kernel_arg
 {
-	const char		*name;
-	size_t			size;
-	t_cl_arg_type	type;
-	void			*value;
-}	t_kernel_arg;
+	const char			*name;
+	size_t				size;
+	enum e_cl_arg_type	type;
+	void				*value;
+};
 
-typedef struct s_kernel
+struct s_kernel
 {
-	const char		*name;
-	cl_kernel		kernel;
-	cl_uint			arg_count;
-	t_kernel_arg	*args;
-	void			*_arg_values;
-}	t_kernel;
+	const char			*name;
+	cl_kernel			kernel;
+	cl_uint				arg_count;
+	struct s_kernel_arg	*args;
+	void				*_arg_values;
+};
 
-typedef struct s_cl
+struct s_cl
 {
 	cl_platform_id		platform;
 	cl_device_id		device;
@@ -83,15 +105,45 @@ typedef struct s_cl
 	cl_command_queue	command_queue;
 	cl_program			program;
 	cl_mem				cl_screen;
-	t_kernel			*kernel;
+	struct s_kernel		*current_kernel;
 	size_t				kernel_count;
-	t_kernel			*kernels;
+	struct s_kernel		*kernels;
 	size_t				_kernel_names_size;
 	char				*_kernel_names;
-}	t_cl;
+};
 
-extern const t_cl_type	g_cl_types[CL_TYPE_COUNT];
-extern const t_arg_info	g_needed_kernel_args[CL_KERNEL_NEEDED_ARG_COUNT];
+/* ************************************************************************** */
+/*                                                                            */
+/* Types                                                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
+typedef enum e_cl_arg_type	t_cl_arg_type;
+
+typedef struct s_arg_info	t_arg_info;
+
+typedef struct s_cl_type	t_cl_type;
+
+typedef struct s_kernel_arg	t_kernel_arg;
+
+typedef struct s_kernel		t_kernel;
+
+typedef struct s_cl			t_cl;
+
+/* ************************************************************************** */
+/*                                                                            */
+/* Global variables                                                           */
+/*                                                                            */
+/* ************************************************************************** */
+
+extern const t_cl_type		g_cl_types[CL_TYPE_COUNT];
+extern const t_arg_info		g_needed_kernel_args[CL_KERNEL_NEEDED_ARG_COUNT];
+
+/* ************************************************************************** */
+/*                                                                            */
+/* Header protoypes                                                           */
+/*                                                                            */
+/* ************************************************************************** */
 
 int		init_opencl(
 			t_cl *cl,
