@@ -146,6 +146,8 @@ __kernel void	julia_toulouse(
 	screen[x + WIDTH * y] = color;
 }
 
+// x = -1.253583
+// y = 0.382563
 __kernel void	mandelbrot_toulouse(
 					__global int *screen,
 					uint width,

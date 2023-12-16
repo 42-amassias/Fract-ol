@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 14:00:38 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 16:09:18 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/16 07:01:21 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,9 @@ int		init_mlx(
 			unsigned int width,
 			unsigned int height,
 			t_handlers *handlers);
+
+int		mlx_destroy(
+			t_mlx *mlx);
 
 void	cleanup_mlx(
 			t_mlx *mlx);

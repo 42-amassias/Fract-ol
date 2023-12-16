@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2023/12/16 05:18:03 by amassias         ###   ########.fr        #
+#    Updated: 2023/12/16 07:01:40 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -69,6 +69,7 @@ FILES			:=					\
 	cl/prime_private_kernel_fields	\
 	mlx/cleanup_mlx					\
 	mlx/init_mlx					\
+	mlx/mlx_destroy					\
 	utils/read_file					\
 
 SRCS			:=	$(addprefix $(SRC_DIR)/,$(addsuffix .c,$(FILES)))

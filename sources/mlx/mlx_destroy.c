@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleanup_mlx.c                                      :+:      :+:    :+:   */
+/*   mlx_destroy.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/15 16:08:35 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/16 07:00:50 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/16 06:58:47 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/16 07:02:13 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-void	cleanup_mlx(
-			t_mlx *mlx)
+int	mlx_destroy(
+		t_mlx *mlx)
 {
 	if (mlx->mlx == NULL)
-		return ;
-	if (mlx->img)
-		mlx_destroy_image(mlx->mlx, mlx->img);
-	if (mlx->window)
-		mlx_destroy_window(mlx->mlx, mlx->window);
-	mlx_destroy(mlx);
+		return (EXIT_SUCCESS);
+	mlx_destroy_display(mlx->mlx);
+	free(mlx->mlx);
+	return (EXIT_SUCCESS);
 }
