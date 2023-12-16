@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 21:01:34 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 19:07:37 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/16 05:05:30 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,17 +66,16 @@ int	build_kernel(
 {
 	size_t	i;
 	size_t	off;
-	size_t	arg_buffer_size;
 
 	if (_get_argument_count_and_verify_mandatory_arguments(kernel))
 		return (EXIT_FAILURE);
 	if (_query_arguments(kernel))
 		return (free(kernel->args), EXIT_FAILURE);
 	i = 0;
-	arg_buffer_size = 0;
+	off = 0;
 	while (i < kernel->arg_count)
-		arg_buffer_size += kernel->args[i++].size;
-	kernel->_arg_values = (char *) ft_calloc(1, arg_buffer_size);
+		off += kernel->args[i++].size;
+	kernel->_arg_values = (char *) ft_calloc(1, off);
 	if (kernel->_arg_values == NULL)
 		return (_cleanup_kernel_args(kernel->args, kernel->arg_count),
 			free(kernel->args), EXIT_FAILURE);
@@ -85,6 +84,8 @@ int	build_kernel(
 	while (i < kernel->arg_count)
 	{
 		kernel->args[i].value = (char *)kernel->_arg_values + off;
+		clSetKernelArg(kernel->kernel, i + CL_KERNEL_PRIVTAE_ARG_COUNT,
+			kernel->args[i].size, kernel->args[i].value);
 		off += kernel->args[i++].size;
 	}
 	return (EXIT_SUCCESS);
@@ -106,7 +107,7 @@ static int	_get_argument_count_and_verify_mandatory_arguments(
 		return (EXIT_FAILURE);
 	if (kernel->arg_count < CL_KERNEL_NEEDED_ARG_COUNT)
 		return (ft_printf(MISSING_ARGUMENTS_ERROR_MESSAGE), EXIT_FAILURE);
-	kernel->arg_count -= CL_KERNEL_NEEDED_ARG_COUNT;
+	kernel->arg_count -= CL_KERNEL_PRIVTAE_ARG_COUNT;
 	i = 0;
 	while (i < CL_KERNEL_NEEDED_ARG_COUNT)
 		if (_check_special_argument(kernel, &g_needed_kernel_args[i++]))
@@ -158,11 +159,11 @@ static int	_query_arguments(
 	while (i < kernel->arg_count)
 	{
 		if (cl_get_kernel_arg_info__str(
-				kernel->kernel, i + CL_KERNEL_NEEDED_ARG_COUNT,
+				kernel->kernel, i + CL_KERNEL_PRIVTAE_ARG_COUNT,
 				CL_KERNEL_ARG_NAME, (void **)&kernel->args[i].name))
 			return (_cleanup_kernel_args(kernel->args, i), EXIT_FAILURE);
 		if (cl_get_kernel_arg_info__str(
-				kernel->kernel, i + CL_KERNEL_NEEDED_ARG_COUNT,
+				kernel->kernel, i + CL_KERNEL_PRIVTAE_ARG_COUNT,
 				CL_KERNEL_ARG_TYPE_NAME, (void **)&type))
 			return (free((char *)kernel->name),
 				_cleanup_kernel_args(kernel->args, i), EXIT_FAILURE);

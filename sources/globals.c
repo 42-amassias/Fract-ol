@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 20:15:54 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 17:43:59 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/16 04:48:34 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,9 @@ const t_cl_type		g_cl_types[] = {
 
 const t_arg_info	g_needed_kernel_args[] = {
 {0, "screen", "int*", CL_KERNEL_ARG_ADDRESS_GLOBAL},
-{1, "dx", "double", CL_KERNEL_ARG_ADDRESS_PRIVATE},
-{2, "dy", "double", CL_KERNEL_ARG_ADDRESS_PRIVATE},
-{3, "zoom", "double", CL_KERNEL_ARG_ADDRESS_PRIVATE},
+{1, "width", "uint", CL_KERNEL_ARG_ADDRESS_PRIVATE},
+{2, "height", "uint", CL_KERNEL_ARG_ADDRESS_PRIVATE},
+{3, "dx", "double", CL_KERNEL_ARG_ADDRESS_PRIVATE},
+{4, "dy", "double", CL_KERNEL_ARG_ADDRESS_PRIVATE},
+{5, "zoom", "double", CL_KERNEL_ARG_ADDRESS_PRIVATE},
 };

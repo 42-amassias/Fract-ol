@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 13:56:57 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 17:10:17 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/15 23:23:12 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,8 @@ static int	_loop(
 				t_mlx *mlx)
 {
 	if (mlx->handlers.update(mlx->handlers.context.update))
-		return (EXIT_FAILURE);
+		return (mlx_loop_end(mlx->mlx), EXIT_FAILURE);
 	if (mlx->handlers.render(mlx->handlers.context.render))
-		return (EXIT_FAILURE);
+		return (mlx_loop_end(mlx->mlx), EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 20:32:13 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 17:19:38 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/16 04:55:42 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,15 +68,17 @@ int	init_opencl_kernels(
 		return (EXIT_FAILURE);
 	if (_query_infos(cl) != EXIT_SUCCESS)
 		return (EXIT_FAILURE);
-	ft_printf("Kernel names: %s\n", cl->_kernel_names);
 	parse_kernel_names(cl->_kernel_names);
 	cl->kernels = (t_kernel *)
-		malloc(cl->kernel_count * sizeof(t_kernel));
+		ft_calloc(cl->kernel_count, sizeof(t_kernel));
 	if (cl->kernels == NULL)
 		return (EXIT_FAILURE);
 	if (build_kernels(cl) != EXIT_SUCCESS)
+	{
+		free(cl->kernels);
+		cl->kernels = NULL;
 		return (EXIT_FAILURE);
-	cl->current_kernel = cl->kernels;
+	}
 	return (EXIT_SUCCESS);
 }
 

@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 21:01:34 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 13:23:48 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/16 05:05:54 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ int	build_kernels(
 			ft_printf("Failed to build kernel \"%s\"\n", kernel->name);
 			return (cleanup_kernels(cl, i - 1), EXIT_FAILURE);
 		}
+		clSetKernelArg(kernel->kernel, 0, sizeof(cl_mem), &cl->cl_screen);
 		name = _get_next_name(name);
 	}
 	return (EXIT_SUCCESS);

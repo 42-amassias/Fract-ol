@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 20:21:31 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 17:49:30 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/15 22:01:02 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 /* ************************************************************************** */
 
 #include "opencl.h"
+
+#include <libft.h>
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -45,6 +47,7 @@ int	init_opencl(
 {
 	cl_int	error_code;
 
+	ft_memset(cl, 0, sizeof(t_cl));
 	if (cl_get_platform_id(&cl->platform) != EXIT_SUCCESS)
 		return (EXIT_FAILURE);
 	if (cl_get_device_id(cl->platform, &cl->device) != EXIT_SUCCESS)

@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 18:14:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 17:54:47 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/16 05:16:01 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,15 @@
 # define LOG_SIZE 4096
 
 # define KERNEL_ARG_INDEX__BUFFER 0
-# define KERNEL_ARG_INDEX__DX 1
-# define KERNEL_ARG_INDEX__DY 2
-# define KERNEL_ARG_INDEX__ZOOM 3
+# define KERNEL_ARG_INDEX__WIDTH 1
+# define KERNEL_ARG_INDEX__HEIGHT 2
+# define KERNEL_ARG_INDEX__DX 3
+# define KERNEL_ARG_INDEX__DY 4
+# define KERNEL_ARG_INDEX__ZOOM 5
 
 # define CL_TYPE_COUNT 10
-# define CL_KERNEL_NEEDED_ARG_COUNT 4
+# define CL_KERNEL_NEEDED_ARG_COUNT 6
+# define CL_KERNEL_PRIVTAE_ARG_COUNT 3
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -163,6 +166,11 @@ int		get_param_size(
 			const char *type,
 			size_t *size,
 			t_cl_arg_type *internal_type);
+
+int		prime_private_kernel_fields(
+			t_cl *cl,
+			cl_uint width,
+			cl_uint height);
 
 void	cleanup_kernels(
 			t_cl *cl,

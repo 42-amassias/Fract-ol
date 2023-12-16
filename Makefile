@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2023/12/15 18:25:32 by amassias         ###   ########.fr        #
+#    Updated: 2023/12/16 05:18:03 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -54,21 +54,22 @@ LFLAGS			:=					\
 #                                                                              #
 # **************************************************************************** #
 
-FILES			:=		\
-	main				\
-	globals				\
-	cl/build_kernel		\
-	cl/build_kernels	\
-	cl/cleanup_kernels	\
-	cl/cleanup_opencl	\
-	cl/get_param_size	\
-	cl/init_kernels		\
-	cl/init_opencl		\
-	cl/kernel_arg_info	\
-	cl/kernel_info		\
-	mlx/cleanup_mlx		\
-	mlx/init_mlx		\
-	utils/read_file		\
+FILES			:=					\
+	main							\
+	globals							\
+	cl/build_kernel					\
+	cl/build_kernels				\
+	cl/cleanup_kernels				\
+	cl/cleanup_opencl				\
+	cl/get_param_size				\
+	cl/init_kernels					\
+	cl/init_opencl					\
+	cl/kernel_arg_info				\
+	cl/kernel_info					\
+	cl/prime_private_kernel_fields	\
+	mlx/cleanup_mlx					\
+	mlx/init_mlx					\
+	utils/read_file					\
 
 SRCS			:=	$(addprefix $(SRC_DIR)/,$(addsuffix .c,$(FILES)))
 

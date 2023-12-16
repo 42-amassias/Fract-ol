@@ -46,8 +46,110 @@ inline int	f(
 	return (color);
 }
 
-__kernel void	cl__compute_pixel(
+__kernel void	julia_toulouse(
 					__global int *screen,
+					uint width,
+					uint height,
+					double dx,
+					double dy,
+					double zoom,
+					double cx,
+					double cy,
+					int max_itr,
+					double k
+					)
+{
+	int		x;
+	int		y;
+
+	double	zx;
+	double	zy;
+	double	dcx;
+	double	dcy;
+
+	int		itr;
+
+	int		color;
+
+	bool	inside;
+
+	double	R2;
+	double	v;
+	double	d;
+
+	double	tmp;
+	double	zx2;
+	double	zy2;
+
+	x = get_global_id(0);
+	y = get_global_id(1);
+
+	zx = 4. * ((double) x / ((double) (WIDTH - 1))) - 2.;
+	zy = 4. * ((double) y / ((double) (HEIGHT - 1))) - 2.;
+
+	zx *= ((double) WIDTH) / ((double) HEIGHT);
+
+	zx = zx / zoom + dx;
+	zy = zy / zoom + dy;
+	zx2 = zx * zx;
+	zy2 = zy * zy;
+	R2 = zx2 + zy2;
+
+	dcx = 1.;
+	dcy = 0.;
+
+	itr = 0;
+
+	inside = true;
+
+	while (itr++ < max_itr)
+	{
+		if (R2 > THRESHOLD)
+		{
+			inside = false;
+			break ;
+		}
+
+		// dc = 2 * dc * z + 1
+		tmp = dcx;
+		dcx = 2. * (tmp * zx - dcy * zy) + 1;
+		dcy = 2. * (tmp * zy + dcy * zx);
+
+		// z = z*z + c
+		tmp = zx;
+		zx = zx2 - zy2 + cx;
+		zy = 2. * tmp * zy + cy;
+
+		zx2 = zx * zx;
+		zy2 = zy * zy;
+		R2 = zx2 + zy2;
+	}
+
+	color = DEFAULT_COLOR;
+	if (!inside)
+	{
+		tmp = log(R2);
+		if (R2 * tmp * tmp < THICKNESS_FACTOR * THICKNESS_FACTOR * (dcx * dcx + dcy * dcy))
+		{
+			v = log(tmp) - LOG2 * (double)itr;
+			color = f(v / k);
+		}
+		// R2 = sqrt(R2);
+		// tmp = 2. * R2 * log(R2) / sqrt(dcx * dcx + dcy * dcy);
+		// d = tmp / THICKNESS_FACTOR;
+		// if (d > 1.)
+		// 	d = 1.;
+		// v = log(tmp) - LOG2 * (double)itr;
+		// color = lerp(f(v / k), DEFAULT_COLOR, d);
+	}
+
+	screen[x + WIDTH * y] = color;
+}
+
+__kernel void	mandelbrot_toulouse(
+					__global int *screen,
+					uint width,
+					uint height,
 					double dx,
 					double dy,
 					double zoom,
@@ -55,8 +157,6 @@ __kernel void	cl__compute_pixel(
 					double k
 					)
 {
-	int		i;
-
 	int		x;
 	int		y;
 

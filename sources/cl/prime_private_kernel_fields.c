@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleanup_kernels.c                                  :+:      :+:    :+:   */
+/*   prime_private_kernel_fields.c                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/14 21:13:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/16 04:56:33 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/16 05:06:36 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/16 05:18:12 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,28 +24,32 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft.h>
-
-void	cleanup_kernels(
-			t_cl *cl,
-			size_t count)
+int	prime_private_kernel_fields(
+		t_cl *cl,
+		cl_uint width,
+		cl_uint height)
 {
+	size_t		i;
+	cl_int		error_code;
 	t_kernel	*kernel;
 
-	if (cl->kernels == NULL)
-		return ;
-	while (count-- > 0)
+	kernel = cl->kernels;
+	i = 0;
+	while (i++ < cl->kernel_count)
 	{
-		kernel = &cl->kernels[count];
-		if (kernel == NULL)
-			continue ;
-		while (kernel->arg_count-- > 0)
-			free((void *)kernel->args[kernel->arg_count].name);
-		free((void *)kernel->args);
-		free((void *)kernel->_arg_values);
-		clReleaseKernel(kernel->kernel);
+		error_code = clSetKernelArg(kernel->kernel, KERNEL_ARG_INDEX__BUFFER,
+				sizeof(cl_mem), &cl->cl_screen);
+		if (error_code != CL_SUCCESS)
+			return (EXIT_FAILURE);
+		error_code = clSetKernelArg(kernel->kernel, KERNEL_ARG_INDEX__WIDTH,
+				sizeof(cl_uint), &width);
+		if (error_code != CL_SUCCESS)
+			return (EXIT_FAILURE);
+		error_code = clSetKernelArg(kernel->kernel, KERNEL_ARG_INDEX__HEIGHT,
+				sizeof(cl_uint), &height);
+		if (error_code != CL_SUCCESS)
+			return (EXIT_FAILURE);
+		++kernel;
 	}
-	free((void *)cl->_kernel_names);
-	free((void *)cl->kernels);
-	cl->kernels = NULL;
+	return (EXIT_SUCCESS);
 }
