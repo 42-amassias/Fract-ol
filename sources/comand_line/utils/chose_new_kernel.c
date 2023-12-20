@@ -6,11 +6,14 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/20 00:01:21 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 00:01:29 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/20 21:31:24 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "_command_line_internal.h"
+
+static void	print_available_kernels(
+				t_cl *cl);
 
 int	chose_new_kernel(
 		t_cl *cl)
@@ -21,13 +24,7 @@ int	chose_new_kernel(
 	int			t;
 	t_kernel	*kernel;
 
-	ft_printf("Chose one of the available kernels :\n");
-	i = 0;
-	while (i < cl->kernel_count)
-	{
-		ft_printf("\t* %s\n", cl->kernels[i].name);
-		++i;
-	}
+	print_available_kernels(cl);
 	t = 0;
 	kernel = NULL;
 	while (kernel == NULL)
@@ -64,4 +61,21 @@ int	chose_new_kernel(
 			return (EXIT_FAILURE);
 	cl->current_kernel = kernel;
 	return (EXIT_SUCCESS);
+}
+
+static void	print_available_kernels(
+				t_cl *cl)
+{
+	size_t	i;
+	char	header;
+
+	ft_printf("Chose one of the available kernels :\n");
+	i = 0;
+	while (i < cl->kernel_count)
+	{
+		header = '*';
+		if (cl->current_kernel == &cl->kernels[i])
+			header = '>';
+		ft_printf("\t%c %s\n", header, cl->kernels[i++].name);
+	}
 }
