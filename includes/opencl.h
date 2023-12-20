@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 18:14:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/16 05:16:01 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/20 04:22:50 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,10 @@
 # define CL_KERNEL_NEEDED_ARG_COUNT 6
 # define CL_KERNEL_PRIVTAE_ARG_COUNT 3
 
+# define CL_ARG_TYPE__TYPE_MASK 0x00F
+# define CL_ARG_TYPE__ATTR_MASK 0x0F0
+# define CL_ARG_TYPE__CATEGORY_MASK 0xF00
+
 /* ************************************************************************** */
 /*                                                                            */
 /* Enums                                                                      */
@@ -49,14 +53,18 @@
 
 enum e_cl_arg_type
 {
+	CL_ARG_TYPE_INTEGER = 0x100,
+	CL_ARG_TYPE_ATTR_SIGNED = 0x110,
 	CL_ARG_TYPE__CHAR,
 	CL_ARG_TYPE__SHORT,
 	CL_ARG_TYPE__INT,
 	CL_ARG_TYPE__LONG,
+	CL_ARG_TYPE_ATTR_UNSIGNED = 0x120,
 	CL_ARG_TYPE__UCHAR,
 	CL_ARG_TYPE__USHORT,
 	CL_ARG_TYPE__UINT,
 	CL_ARG_TYPE__ULONG,
+	CL_ARG_TYPE_FLOATING = 0x200,
 	CL_ARG_TYPE__FLOAT,
 	CL_ARG_TYPE__DOUBLE,
 	CL_ARG_TYPE_COUNT,
@@ -148,58 +156,61 @@ extern const t_arg_info		g_needed_kernel_args[CL_KERNEL_NEEDED_ARG_COUNT];
 /*                                                                            */
 /* ************************************************************************** */
 
-int		init_opencl(
-			t_cl *cl,
-			char *screen_back_buffer,
-			size_t pixel_count);
+int			init_opencl(
+				t_cl *cl,
+				char *screen_back_buffer,
+				size_t pixel_count);
 
-int		init_opencl_kernels(
-			t_cl *cl);
+int			init_opencl_kernels(
+				t_cl *cl);
 
-int		build_kernels(
-			t_cl *cl);
+int			build_kernels(
+				t_cl *cl);
 
-int		build_kernel(
-			t_kernel *kernel);
+int			build_kernel(
+				t_kernel *kernel);
 
-int		get_param_size(
-			const char *type,
-			size_t *size,
-			t_cl_arg_type *internal_type);
+int			get_param_size(
+				const char *type,
+				size_t *size,
+				t_cl_arg_type *internal_type);
 
-int		prime_private_kernel_fields(
-			t_cl *cl,
-			cl_uint width,
-			cl_uint height);
+int			prime_private_kernel_fields(
+				t_cl *cl,
+				cl_uint width,
+				cl_uint height);
 
-void	cleanup_kernels(
-			t_cl *cl,
-			size_t count);
+void		cleanup_kernels(
+				t_cl *cl,
+				size_t count);
 
 // TODO: cleanup kernels
-void	cleanup_opencl(
-			t_cl *cl);
+void		cleanup_opencl(
+				t_cl *cl);
 
-int		cl_get_kernel_info__int(
-			cl_kernel kernel,
-			cl_kernel_info info,
-			void *value);
+int			cl_get_kernel_info__int(
+				cl_kernel kernel,
+				cl_kernel_info info,
+				void *value);
 
-int		cl_get_kernel_info__str(
-			cl_kernel kernel,
-			cl_kernel_info info,
-			void **string_ptr);
+int			cl_get_kernel_info__str(
+				cl_kernel kernel,
+				cl_kernel_info info,
+				void **string_ptr);
 
-int		cl_get_kernel_arg_info__int(
-			cl_kernel kernel,
-			cl_uint index,
-			cl_kernel_info info,
-			void *value);
+int			cl_get_kernel_arg_info__int(
+				cl_kernel kernel,
+				cl_uint index,
+				cl_kernel_info info,
+				void *value);
 
-int		cl_get_kernel_arg_info__str(
-			cl_kernel kernel,
-			cl_uint index,
-			cl_kernel_info info,
-			void **string_ptr);
+int			cl_get_kernel_arg_info__str(
+				cl_kernel kernel,
+				cl_uint index,
+				cl_kernel_info info,
+				void **string_ptr);
+
+const char	*get_cl_type_as_str(
+				t_cl_arg_type type);
 
 #endif

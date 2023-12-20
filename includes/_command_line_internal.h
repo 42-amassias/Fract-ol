@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fractol.h                                          :+:      :+:    :+:   */
+/*   _command_line_internal.h                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/13 20:35:58 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 00:21:35 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/19 23:53:55 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/20 20:27:07 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FRACTOL_H
-# define FRACTOL_H
+#ifndef _COMMAND_LINE_INTERNAL_H
+# define _COMMAND_LINE_INTERNAL_H
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -19,55 +19,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "mlx_wrapper.h"
-# include "opencl.h"
-
-# include <libft.h>
-# include <math.h>
-# include <mlx.h>
-# include <pthread.h>
-# include <stdbool.h>
-# include <stdio.h>
+# include "fractol.h"
 
 /* ************************************************************************** */
 /*                                                                            */
-/* Defines                                                                    */
+/* Unions                                                                     */
 /*                                                                            */
 /* ************************************************************************** */
 
-# define WIDTH 1920
-# define HEIGHT 1080
-
-/* ************************************************************************** */
-/*                                                                            */
-/* Structures                                                                 */
-/*                                                                            */
-/* ************************************************************************** */
-
-struct s_error
+union u_type
 {
-	int			code;
-	const char	*message;
-};
-
-struct s_threading
-{
-	struct s_is_alive
-	{
-		bool	renderer;
-		bool	command_line;
-	}	is_alive;
-	pthread_t		renderer;
-	pthread_t		command_line;
-	pthread_mutex_t	kernel_mutex;
-};
-
-struct s_fractol
-{
-	t_mlx				mlx;
-	t_cl				cl;
-	struct s_threading	threading;
-	struct s_error		error;
+	cl_ulong	u;
+	cl_long		l;
+	cl_double	d;
 };
 
 /* ************************************************************************** */
@@ -76,20 +40,7 @@ struct s_fractol
 /*                                                                            */
 /* ************************************************************************** */
 
-typedef struct s_error		t_error;
-
-typedef struct s_threading	t_threading;
-
-typedef struct s_fractol	t_fractol;
-
-/* ************************************************************************** */
-/*                                                                            */
-/* Global variables                                                           */
-/*                                                                            */
-/* ************************************************************************** */
-
-extern const t_handlers		g_handlers;
-extern t_fractol			g_fractol;
+typedef union u_type	t_type;
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -97,20 +48,69 @@ extern t_fractol			g_fractol;
 /*                                                                            */
 /* ************************************************************************** */
 
-int	update(
+// Utils
+
+int	parse_command(
+		const char *input,
 		t_fractol *fractol);
 
-int	render(
+int	chose_new_kernel(
+		t_cl *cl);
+
+int	change_param(
+		t_kernel *kernel,
+		cl_uint index);
+
+// -----
+// QUIT
+// -----
+
+int	command__quit(
+		char **tokens,
 		t_fractol *fractol);
 
-int	handle_keys(
-		int keycode,
-		t_fractol *fractol);
+// -----
+// SET
+// -----
 
-int	handle_mouse(
-		int button,
-		int x,
-		int y,
-		t_fractol *fractol);
+int	command__set(
+		char **tokens,
+		t_cl *cl);
+
+int	command__set__param(
+		char **tokens,
+		t_cl *cl);
+
+int	command__set__param__name(
+		char **tokens,
+		t_cl *cl);
+
+int	command__set__kernel(
+		char **tokens,
+		t_cl *cl);
+
+int	command__set__kernel__name(
+		char **tokens,
+		t_cl *cl);
+
+// -----
+// PRINT
+// -----
+
+int	command__print(
+		char **tokens,
+		t_cl *cl);
+
+int	command__print__params(
+		char **tokens,
+		t_cl *cl);
+
+int	command__print__current(
+		char **tokens,
+		t_cl *cl);
+
+int	command__print__kernels(
+		char **tokens,
+		t_cl *cl);
 
 #endif

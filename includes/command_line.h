@@ -1,14 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleanup_kernels.c                                  :+:      :+:    :+:   */
+/*   command_line.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/14 21:13:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:26:00 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/19 23:53:27 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/20 20:27:49 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#ifndef COMMAND_LINE_H
+# define COMMAND_LINE_H
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -16,36 +19,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opencl.h"
-
-#include <libft.h>
+# include "fractol.h"
 
 /* ************************************************************************** */
 /*                                                                            */
-/* Header implementation                                                      */
+/* Header protoypes                                                           */
 /*                                                                            */
 /* ************************************************************************** */
 
-void	cleanup_kernels(
-			t_cl *cl,
-			size_t count)
-{
-	t_kernel	*kernel;
+void	*command_line_routine(
+			t_fractol *fractol);
 
-	if (cl->kernels == NULL)
-		return ;
-	while (count-- > 0)
-	{
-		kernel = &cl->kernels[count];
-		if (kernel == NULL)
-			continue ;
-		while (kernel->arg_count-- > 0)
-			free((void *)kernel->args[kernel->arg_count].name);
-		free((void *)kernel->args);
-		free((void *)kernel->_arg_values);
-		clReleaseKernel(kernel->kernel);
-	}
-	free((void *)cl->_kernel_names);
-	free((void *)cl->kernels);
-	cl->kernels = NULL;
-}
+#endif

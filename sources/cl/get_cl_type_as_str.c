@@ -1,24 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleanup_kernels.c                                  :+:      :+:    :+:   */
+/*   get_cl_type_as_str.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/14 21:13:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:26:00 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/19 23:19:47 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/19 23:20:33 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /* ************************************************************************** */
 /*                                                                            */
-/* Includes                                                                   */
+/* Inlcudes                                                                   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "opencl.h"
-
-#include <libft.h>
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -26,26 +24,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-void	cleanup_kernels(
-			t_cl *cl,
-			size_t count)
+const char	*get_cl_type_as_str(
+				t_cl_arg_type type)
 {
-	t_kernel	*kernel;
+	size_t	i;
 
-	if (cl->kernels == NULL)
-		return ;
-	while (count-- > 0)
-	{
-		kernel = &cl->kernels[count];
-		if (kernel == NULL)
-			continue ;
-		while (kernel->arg_count-- > 0)
-			free((void *)kernel->args[kernel->arg_count].name);
-		free((void *)kernel->args);
-		free((void *)kernel->_arg_values);
-		clReleaseKernel(kernel->kernel);
-	}
-	free((void *)cl->_kernel_names);
-	free((void *)cl->kernels);
-	cl->kernels = NULL;
+	i = 0;
+	while (i < CL_TYPE_COUNT)
+		if (g_cl_types[i++].internal_type == type)
+			return (g_cl_types[i - 1].str_type);
+	return ("Unknown");
 }

@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 13:18:44 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/15 13:19:21 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/20 20:38:33 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@
 void	cleanup_opencl(
 			t_cl *cl)
 {
+	if (cl->command_queue)
+		clFinish(cl->command_queue);
 	clReleaseMemObject(cl->cl_screen);
 	cleanup_kernels(cl, cl->kernel_count);
 	clReleaseProgram(cl->program);

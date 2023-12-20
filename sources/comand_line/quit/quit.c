@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleanup_kernels.c                                  :+:      :+:    :+:   */
+/*   quit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/14 21:13:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:26:00 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/20 00:12:39 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/20 20:19:28 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opencl.h"
+#include "_command_line_internal.h"
 
-#include <libft.h>
+/* ************************************************************************** */
+/*                                                                            */
+/* Defines                                                                    */
+/*                                                                            */
+/* ************************************************************************** */
+
+#define ERROR_EXTRA \
+	"Error: Extra parameters for 'quit'.\n"
+
+#define ERROR__HELP \
+	"Try 'help quit' for more information.\n"
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -26,26 +36,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-void	cleanup_kernels(
-			t_cl *cl,
-			size_t count)
-{
-	t_kernel	*kernel;
+// TODO: instead of `mlx_loop_end`, set a flag.
 
-	if (cl->kernels == NULL)
-		return ;
-	while (count-- > 0)
+int	command__quit(
+		char **tokens,
+		t_fractol *fractol)
+{
+	if (tokens[0] != NULL)
 	{
-		kernel = &cl->kernels[count];
-		if (kernel == NULL)
-			continue ;
-		while (kernel->arg_count-- > 0)
-			free((void *)kernel->args[kernel->arg_count].name);
-		free((void *)kernel->args);
-		free((void *)kernel->_arg_values);
-		clReleaseKernel(kernel->kernel);
+		ft_putstr_fd(ERROR_EXTRA ERROR__HELP, STDERR_FILENO);
+		return (EXIT_FAILURE);
 	}
-	free((void *)cl->_kernel_names);
-	free((void *)cl->kernels);
-	cl->kernels = NULL;
+	ft_putstr("Goodbye !\n");
+	mlx_loop_end(fractol->mlx.mlx);
+	return (EXIT_SUCCESS);
 }

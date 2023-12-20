@@ -146,8 +146,20 @@ __kernel void	julia_toulouse(
 	screen[x + WIDTH * y] = color;
 }
 
+// ---- ---- ??? ---- ----- //
 // x = -1.253583
 // y = 0.382563
+// ---- ---- ??? ---- ----- //
+
+// ---- ---- ---- ---- ----  THE SQUARE ---- ---- ---- ---- ---- //
+// Current kernel's arguments :
+//         * double          dx              = -0.782385
+//         * double          dy              = -0.137764
+//         * double          zoom            = 15934088.227282
+//         * int             max_itr         = 1024
+//         * double          k               = 0.900000
+// ---- ---- ---- ---- ----  THE SQUARE ---- ---- ---- ---- ---- //
+
 __kernel void	mandelbrot_toulouse(
 					__global int *screen,
 					uint width,

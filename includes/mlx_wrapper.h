@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 14:00:38 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/16 07:01:21 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/20 00:23:15 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ struct s_mlx
 	void				*window;
 	void				*img;
 	char				*screen;
-	struct s_handlers	handlers;
 };
 
 /* ************************************************************************** */
@@ -80,8 +79,7 @@ typedef struct s_handlers	t_handlers;
 int		init_mlx(
 			t_mlx *mlx,
 			unsigned int width,
-			unsigned int height,
-			t_handlers *handlers);
+			unsigned int height);
 
 int		mlx_destroy(
 			t_mlx *mlx);

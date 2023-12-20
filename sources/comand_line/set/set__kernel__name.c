@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleanup_kernels.c                                  :+:      :+:    :+:   */
+/*   set__kernel__name.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/14 21:13:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:26:00 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/20 00:03:49 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/20 20:17:48 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opencl.h"
+#include "_command_line_internal.h"
 
-#include <libft.h>
+/* ************************************************************************** */
+/*                                                                            */
+/* Defines                                                                    */
+/*                                                                            */
+/* ************************************************************************** */
+
+#define ERROR__EXTRA_PARAM \
+	"Error: Extra parameters for 'set kernel [KERNEL_NAME]'.\n"
+
+#define ERROR__UNKNOWN_KERNEL \
+	"Unknown kernel \"%s\".\n"
+
+#define ERROR__HELP \
+	"Try 'help set kernel' for more information.\n"
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -26,26 +39,29 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-void	cleanup_kernels(
-			t_cl *cl,
-			size_t count)
+int	command__set__kernel__name(
+		char **tokens,
+		t_cl *cl)
 {
-	t_kernel	*kernel;
+	size_t	i;
 
-	if (cl->kernels == NULL)
-		return ;
-	while (count-- > 0)
+	if (tokens[1] != NULL)
 	{
-		kernel = &cl->kernels[count];
-		if (kernel == NULL)
-			continue ;
-		while (kernel->arg_count-- > 0)
-			free((void *)kernel->args[kernel->arg_count].name);
-		free((void *)kernel->args);
-		free((void *)kernel->_arg_values);
-		clReleaseKernel(kernel->kernel);
+		ft_putstr_fd(ERROR__EXTRA_PARAM ERROR__HELP, STDERR_FILENO);
+		return (EXIT_FAILURE);
 	}
-	free((void *)cl->_kernel_names);
-	free((void *)cl->kernels);
-	cl->kernels = NULL;
+	i = 0;
+	while (i < cl->kernel_count)
+	{
+		if (ft_strcmp(tokens[0], cl->kernels[i].name) == 0)
+			break ;
+		++i;
+	}
+	if (i == cl->kernel_count)
+	{
+		ft_printf(ERROR__UNKNOWN_KERNEL ERROR__HELP, tokens[0]);
+		return (EXIT_FAILURE);
+	}
+	cl->current_kernel = &cl->kernels[i];
+	return (EXIT_SUCCESS);
 }

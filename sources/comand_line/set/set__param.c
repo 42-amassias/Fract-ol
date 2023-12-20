@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleanup_kernels.c                                  :+:      :+:    :+:   */
+/*   set__param.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/14 21:13:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:26:00 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/20 00:11:38 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/20 20:17:09 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opencl.h"
+#include "_command_line_internal.h"
 
-#include <libft.h>
+/* ************************************************************************** */
+/*                                                                            */
+/* Defines                                                                    */
+/*                                                                            */
+/* ************************************************************************** */
+
+#define ERROR__MISSING \
+	"Error: Error: Missing parameters !\n"
+
+#define ERROR__HELP \
+	"Try 'help set param' for more information.\n"
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -26,26 +36,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-void	cleanup_kernels(
-			t_cl *cl,
-			size_t count)
+int	command__set__param(
+		char **tokens,
+		t_cl *cl)
 {
-	t_kernel	*kernel;
-
-	if (cl->kernels == NULL)
-		return ;
-	while (count-- > 0)
-	{
-		kernel = &cl->kernels[count];
-		if (kernel == NULL)
-			continue ;
-		while (kernel->arg_count-- > 0)
-			free((void *)kernel->args[kernel->arg_count].name);
-		free((void *)kernel->args);
-		free((void *)kernel->_arg_values);
-		clReleaseKernel(kernel->kernel);
-	}
-	free((void *)cl->_kernel_names);
-	free((void *)cl->kernels);
-	cl->kernels = NULL;
+	if (tokens[0] != NULL)
+		return (command__set__param__name(tokens, cl));
+	ft_putstr_fd(ERROR__MISSING ERROR__HELP, STDERR_FILENO);
+	return (EXIT_FAILURE);
 }

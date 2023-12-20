@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleanup_kernels.c                                  :+:      :+:    :+:   */
+/*   read_integer.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/14 21:13:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:26:00 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/20 03:13:30 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/20 20:32:27 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opencl.h"
+#include "utils.h"
 
 #include <libft.h>
 
@@ -26,26 +26,55 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-void	cleanup_kernels(
-			t_cl *cl,
-			size_t count)
+cl_long	read_integer_signed(
+			const char *str,
+			const char **end_ptr)
 {
-	t_kernel	*kernel;
+	int		sign;
+	cl_long	value;
 
-	if (cl->kernels == NULL)
-		return ;
-	while (count-- > 0)
+	sign = 1;
+	value = 0;
+	while (*str && ft_isspace(*str))
+		++str;
+	if (*str == '-')
+		sign = -1;
+	if (*str == '-' || *str == '+')
+		++str;
+	if (!ft_isdigit(*str))
 	{
-		kernel = &cl->kernels[count];
-		if (kernel == NULL)
-			continue ;
-		while (kernel->arg_count-- > 0)
-			free((void *)kernel->args[kernel->arg_count].name);
-		free((void *)kernel->args);
-		free((void *)kernel->_arg_values);
-		clReleaseKernel(kernel->kernel);
+		*end_ptr = str;
+		return (0);
 	}
-	free((void *)cl->_kernel_names);
-	free((void *)cl->kernels);
-	cl->kernels = NULL;
+	while (*str && ft_isdigit(*str))
+		value = 10 * value + *str++ - '0';
+	value *= sign;
+	while (*str && ft_isspace(*str))
+		++str;
+	*end_ptr = str;
+	return (value);
+}
+
+cl_ulong	read_integer_unsigned(
+			const char *str,
+			const char **end_ptr)
+{
+	cl_ulong	value;
+
+	value = 0;
+	while (*str && ft_isspace(*str))
+		++str;
+	if (*str == '+')
+		++str;
+	if (!ft_isdigit(*str))
+	{
+		*end_ptr = str;
+		return (0);
+	}
+	while (*str && ft_isdigit(*str))
+		value = 10 * value + *str++ - '0';
+	while (*str && ft_isspace(*str))
+		++str;
+	*end_ptr = str;
+	return (value);
 }

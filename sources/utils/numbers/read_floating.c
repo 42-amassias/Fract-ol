@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_param_size.c                                   :+:      :+:    :+:   */
+/*   read_floating.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/15 12:59:58 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 02:11:26 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/20 03:21:37 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/20 20:32:03 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opencl.h"
+#include "utils.h"
 
 #include <libft.h>
 
@@ -26,8 +26,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-static int	_is_type_ptr(
-				const char *type);
+static const char	*_skip_white_spaces(
+						const char *str);
+
+static int			_read_sign(
+						const char **str_ptr);
+
+static const char	*_read_integer(
+						cl_double *value,
+						const char *str);
+
+static const char	*_read_fract(
+						cl_double *value,
+						const char *str);
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -35,27 +46,30 @@ static int	_is_type_ptr(
 /*                                                                            */
 /* ************************************************************************** */
 
-int	get_param_size(
-		const char *type,
-		size_t *size,
-		t_cl_arg_type *internal_type)
+cl_double	read_floating(
+			const char *str,
+			const char **end_ptr)
 {
-	size_t	i;
+	int			sign;
+	cl_double	value;
 
-	if (_is_type_ptr(type))
-		type = "pointer";
-	i = 0;
-	while (i < CL_ARG_TYPE_COUNT)
+	value = 0;
+	str = _skip_white_spaces(str);
+	if (*str == '\0')
 	{
-		if (ft_strcmp(type, g_cl_types[i].str_type) == 0)
-			break ;
-		++i;
+		*end_ptr = str;
+		return (0.);
 	}
-	if (i == CL_ARG_TYPE_COUNT)
-		return (EXIT_FAILURE);
-	*size = g_cl_types[i].size;
-	*internal_type = g_cl_types[i].internal_type;
-	return (EXIT_SUCCESS);
+	sign = _read_sign(&str);
+	if (*str == '\0')
+	{
+		*end_ptr = str;
+		return (sign * 0.);
+	}
+	str = _read_integer(&value, str);
+	str = _read_fract(&value, str);
+	*end_ptr = str;
+	return (sign * value);
 }
 
 /* ************************************************************************** */
@@ -64,11 +78,53 @@ int	get_param_size(
 /*                                                                            */
 /* ************************************************************************** */
 
-// `type` cannot be an empty string, so taking `type[len(type) - 2]` is ok !
-static int	_is_type_ptr(
-				const char *type)
+static const char	*_skip_white_spaces(
+						const char *str)
 {
-	while (*type)
-		++type;
-	return (type[-1] == '*');
+	while (ft_isspace(*str))
+		++str;
+	return (str);
+}
+
+static int	_read_sign(
+				const char **str_ptr)
+{
+	if (**str_ptr != '+' || **str_ptr != '-')
+		return (1);
+	*str_ptr = *str_ptr + 1;
+	if ((*str_ptr)[-1] == '-')
+		return (-1);
+	return (1);
+}
+
+static const char	*_read_integer(
+						cl_double *value,
+						const char *str)
+{
+	*value = 0.;
+	if (!ft_isdigit(*str))
+		return (str);
+	while (ft_isdigit(*str))
+		*value = 10. * *value + *str++ - '0';
+	return (str);
+}
+
+static const char	*_read_fract(
+						cl_double *value,
+						const char *str)
+{
+	cl_double	fract;
+
+	fract = 0;
+	if (*str != '.')
+		return (_skip_white_spaces(str));
+	++str;
+	if (*value == 0. && !ft_isdigit(*str))
+		return (str - 1);
+	while (ft_isdigit(*str))
+		fract = 10. * fract + *str++ - '0';
+	while (fract >= 1.)
+		fract /= 10.;
+	*value += fract;
+	return (_skip_white_spaces(str));
 }

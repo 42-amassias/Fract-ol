@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleanup_kernels.c                                  :+:      :+:    :+:   */
+/*   print__kernels.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/14 21:13:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:26:00 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/20 00:02:05 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/20 20:23:57 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opencl.h"
+#include "_command_line_internal.h"
 
-#include <libft.h>
+/* ************************************************************************** */
+/*                                                                            */
+/* Defines                                                                    */
+/*                                                                            */
+/* ************************************************************************** */
+
+#define ERROR__EXTRA \
+	"Error: Extra parameters for 'print kernels'.\n"
+
+#define ERROR__HELP \
+	"Try 'help print kernels' for more information.\n"
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -26,26 +36,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-void	cleanup_kernels(
-			t_cl *cl,
-			size_t count)
+int	command__print__kernels(
+		char **tokens,
+		t_cl *cl)
 {
-	t_kernel	*kernel;
+	size_t	i;
 
-	if (cl->kernels == NULL)
-		return ;
-	while (count-- > 0)
+	if (tokens[0] != NULL)
 	{
-		kernel = &cl->kernels[count];
-		if (kernel == NULL)
-			continue ;
-		while (kernel->arg_count-- > 0)
-			free((void *)kernel->args[kernel->arg_count].name);
-		free((void *)kernel->args);
-		free((void *)kernel->_arg_values);
-		clReleaseKernel(kernel->kernel);
+		ft_putstr_fd(ERROR__EXTRA ERROR__HELP, STDERR_FILENO);
+		return (EXIT_FAILURE);
 	}
-	free((void *)cl->_kernel_names);
-	free((void *)cl->kernels);
-	cl->kernels = NULL;
+	ft_putstr("Available kernels :\n");
+	i = 0;
+	while (i < cl->kernel_count)
+		ft_printf("\t* %s\n", cl->kernels[i++].name);
+	return (EXIT_SUCCESS);
 }

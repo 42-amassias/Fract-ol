@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2023/12/16 07:01:40 by amassias         ###   ########.fr        #
+#    Updated: 2023/12/20 20:34:12 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,6 +46,7 @@ LFLAGS			:=					\
 	-L$(LIB_MLX_PATH)				\
 	-lftfull						\
 	-lmlx -lXext -lX11 -lm -lz		\
+	-lpthread						\
 	-lOpenCL 						\
 
 # **************************************************************************** #
@@ -54,23 +55,41 @@ LFLAGS			:=					\
 #                                                                              #
 # **************************************************************************** #
 
-FILES			:=					\
-	main							\
-	globals							\
-	cl/build_kernel					\
-	cl/build_kernels				\
-	cl/cleanup_kernels				\
-	cl/cleanup_opencl				\
-	cl/get_param_size				\
-	cl/init_kernels					\
-	cl/init_opencl					\
-	cl/kernel_arg_info				\
-	cl/kernel_info					\
-	cl/prime_private_kernel_fields	\
-	mlx/cleanup_mlx					\
-	mlx/init_mlx					\
-	mlx/mlx_destroy					\
-	utils/read_file					\
+FILES			:=						\
+	cl/build_kernel						\
+	cl/build_kernels					\
+	cl/cleanup_kernels					\
+	cl/cleanup_opencl					\
+	cl/get_cl_type_as_str				\
+	cl/get_param_size					\
+	cl/init_kernels						\
+	cl/init_opencl						\
+	cl/kernel_arg_info					\
+	cl/kernel_info						\
+	cl/prime_private_kernel_fields		\
+	comand_line/command_line			\
+	comand_line/print/print				\
+	comand_line/print/print__current	\
+	comand_line/print/print__kernels	\
+	comand_line/print/print__params		\
+	comand_line/quit/quit				\
+	comand_line/set/set					\
+	comand_line/set/set__kernel			\
+	comand_line/set/set__kernel__name	\
+	comand_line/set/set__param			\
+	comand_line/set/set__param__name	\
+	comand_line/utils/change_param		\
+	comand_line/utils/chose_new_kernel	\
+	comand_line/utils/parse_command		\
+	globals								\
+	main								\
+	mlx/cleanup_mlx						\
+	mlx/init_mlx						\
+	mlx/mlx_destroy						\
+	utils/numbers/read_floating			\
+	utils/numbers/read_integer			\
+	utils/print_kernel_param			\
+	utils/read_file						\
 
 SRCS			:=	$(addprefix $(SRC_DIR)/,$(addsuffix .c,$(FILES)))
 
@@ -104,10 +123,10 @@ re:	fclean all
 
 # TODO: Eventually remove the restriction on `main.c`.
 norminette:
-	@norminette														\
-		`find $(SRC_DIR) -type f -name \*.c -and -not -name main.c`	\
-		`find $(INC_DIR) -type f -name \*.h`						\
-		| grep -Ev '^Notice: |OK\!$$'								\
+	@norminette												\
+		`find $(SRC_DIR) -type f -name \*.c`				\
+		`find $(INC_DIR) -type f -name \*.h`				\
+		| grep -Ev '^Notice: |OK\!$$'						\
 		&& exit 1 || printf 'Norminette OK!\n' && exit 0
 
 # **************************************************************************** #

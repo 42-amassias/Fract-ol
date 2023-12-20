@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleanup_kernels.c                                  :+:      :+:    :+:   */
+/*   print.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/14 21:13:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:26:00 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/20 00:03:30 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/20 20:19:50 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opencl.h"
+#include "_command_line_internal.h"
 
-#include <libft.h>
+/* ************************************************************************** */
+/*                                                                            */
+/* Defines                                                                    */
+/*                                                                            */
+/* ************************************************************************** */
+
+#define ERROR__MISSING \
+	"Error: Missing parameters !\n"
+
+#define ERROR__SUB_COMMAND \
+	"Unknown sub command \"%s\" for 'print'.\n"
+
+#define ERROR__HELP \
+	"Try 'help print' for more information.\n"
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -26,26 +39,21 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-void	cleanup_kernels(
-			t_cl *cl,
-			size_t count)
+int	command__print(
+		char **tokens,
+		t_cl *cl)
 {
-	t_kernel	*kernel;
-
-	if (cl->kernels == NULL)
-		return ;
-	while (count-- > 0)
+	if (tokens[0] == NULL)
 	{
-		kernel = &cl->kernels[count];
-		if (kernel == NULL)
-			continue ;
-		while (kernel->arg_count-- > 0)
-			free((void *)kernel->args[kernel->arg_count].name);
-		free((void *)kernel->args);
-		free((void *)kernel->_arg_values);
-		clReleaseKernel(kernel->kernel);
+		ft_putstr_fd(ERROR__MISSING ERROR__HELP, STDERR_FILENO);
+		return (EXIT_FAILURE);
 	}
-	free((void *)cl->_kernel_names);
-	free((void *)cl->kernels);
-	cl->kernels = NULL;
+	if (ft_strcmp(tokens[0], "kernels") == 0)
+		return (command__print__kernels(tokens + 1, cl));
+	if (ft_strcmp(tokens[0], "current") == 0)
+		return (command__print__current(tokens + 1, cl));
+	if (ft_strcmp(tokens[0], "params") == 0)
+		return (command__print__params(tokens + 1, cl));
+	ft_fprintf(STDERR_FILENO, ERROR__SUB_COMMAND ERROR__HELP, tokens[0]);
+	return (EXIT_FAILURE);
 }

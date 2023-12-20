@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_param_size.c                                   :+:      :+:    :+:   */
+/*   print__params.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/15 12:59:58 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 02:11:26 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/20 00:03:05 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/20 20:20:13 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,18 +16,24 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "opencl.h"
+#include "_command_line_internal.h"
 
-#include <libft.h>
+#include "utils.h"
 
 /* ************************************************************************** */
 /*                                                                            */
-/* Helper protoypes                                                           */
+/* Defines                                                                    */
 /*                                                                            */
 /* ************************************************************************** */
 
-static int	_is_type_ptr(
-				const char *type);
+#define ERROR__EXTRA_PARAM \
+	"Error: Extra parameters for 'print params'.\n"
+
+#define ERROR__NO_KERNEL \
+	"No kernel is currently selected. Use \"help set kernel\" for more infos.\n"
+
+#define ERROR__HELP \
+	"Try 'help print params' for more information.\n"
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -35,40 +41,31 @@ static int	_is_type_ptr(
 /*                                                                            */
 /* ************************************************************************** */
 
-int	get_param_size(
-		const char *type,
-		size_t *size,
-		t_cl_arg_type *internal_type)
+int	command__print__params(
+		char **tokens,
+		t_cl *cl)
 {
 	size_t	i;
 
-	if (_is_type_ptr(type))
-		type = "pointer";
-	i = 0;
-	while (i < CL_ARG_TYPE_COUNT)
+	if (tokens[0] != NULL)
 	{
-		if (ft_strcmp(type, g_cl_types[i].str_type) == 0)
-			break ;
-		++i;
-	}
-	if (i == CL_ARG_TYPE_COUNT)
+		ft_putstr_fd(ERROR__EXTRA_PARAM ERROR__HELP, STDERR_FILENO);
 		return (EXIT_FAILURE);
-	*size = g_cl_types[i].size;
-	*internal_type = g_cl_types[i].internal_type;
+	}
+	if (cl->current_kernel == NULL)
+	{
+		ft_putstr(ERROR__NO_KERNEL);
+		return (EXIT_FAILURE);
+	}
+	ft_putstr("Current kernel's arguments :\n");
+	i = 0;
+	while (i < cl->current_kernel->arg_count)
+	{
+		ft_printf("\t* %-15s %-15s = ",
+			get_cl_type_as_str(cl->current_kernel->args[i].type),
+			cl->current_kernel->args[i].name);
+		print_kernel_param(&cl->current_kernel->args[i++]);
+		ft_putchar('\n');
+	}
 	return (EXIT_SUCCESS);
-}
-
-/* ************************************************************************** */
-/*                                                                            */
-/* Helper implementation                                                      */
-/*                                                                            */
-/* ************************************************************************** */
-
-// `type` cannot be an empty string, so taking `type[len(type) - 2]` is ok !
-static int	_is_type_ptr(
-				const char *type)
-{
-	while (*type)
-		++type;
-	return (type[-1] == '*');
 }
