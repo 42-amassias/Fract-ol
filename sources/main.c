@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/06 15:23:11 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 01:00:58 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 01:10:51 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,7 @@ int	main(void)
 	t_fractol	*fractol;
 	int			error_code;
 
-	fractol = (t_fractol *)malloc(sizeof(t_fractol));
+	fractol = (t_fractol *)ft_calloc(1, sizeof(t_fractol));
 	if (fractol == NULL)
 	{
 		ft_fprintf(STDERR_FILENO, "Internal error\n");
