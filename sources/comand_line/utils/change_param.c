@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/20 00:00:11 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 04:28:20 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 00:59:49 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ int	change_param(
 {
 	char			*line;
 	const char		*end;
-	cl_int			error_code;
 	t_kernel_arg	*arg;
 	t_type			t;
 
@@ -90,9 +89,7 @@ int	change_param(
 	else
 		ft_memset(arg->value, 0, arg->size);
 	free(line);
-	error_code = clSetKernelArg(kernel->kernel, index + CL_KERNEL_PRIVTAE_ARG_COUNT, arg->size, arg->value);
-	if (error_code != CL_SUCCESS)
-		return (ft_printf("Failed to set kernel arg: %d\n", error_code), EXIT_FAILURE);
+	arg->need_update_on_device = true;
 	return (EXIT_SUCCESS);
 }
 

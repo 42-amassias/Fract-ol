@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 18:14:09 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 04:22:50 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/20 22:11:49 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 
 # define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 # include <CL/cl.h>
+
+#include <stdbool.h>
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -97,6 +99,7 @@ struct s_kernel_arg
 	size_t				size;
 	enum e_cl_arg_type	type;
 	void				*value;
+	bool				need_update_on_device;
 };
 
 struct s_kernel

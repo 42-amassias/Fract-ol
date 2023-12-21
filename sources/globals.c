@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 20:15:54 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 00:21:26 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 00:16:15 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-t_fractol			g_fractol = {0};
+// t_fractol			g_fractol = {0};
 
 const t_cl_type		g_cl_types[] = {
 {"char", CL_ARG_TYPE__CHAR, sizeof(cl_char)},
@@ -49,14 +49,14 @@ const t_arg_info	g_needed_kernel_args[] = {
 {5, "zoom", "double", CL_KERNEL_ARG_ADDRESS_PRIVATE},
 };
 
-const t_handlers	g_handlers = {
-	.update = (int (*)(void *))update,
-	.render = (int (*)(void *))render,
-	.keyboard = (int (*)(int, void *))handle_keys,
-	.mouse = (int (*)(int, int, int, void *))handle_mouse,
-	.context = {
-	.update = &g_fractol,
-	.render = &g_fractol,
-	.keyboard = &g_fractol,
-	.mouse = &g_fractol,}
-};
+// const t_handlers	g_handlers = {
+// 	.update = (int (*)(void *))update,
+// 	.render = (int (*)(void *))render,
+// 	.keyboard = (int (*)(int, void *))handle_keys,
+// 	.mouse = (int (*)(int, int, int, void *))handle_mouse,
+// 	.context = {
+// 	.update = &g_fractol,
+// 	.render = &g_fractol,
+// 	.keyboard = &g_fractol,
+// 	.mouse = &g_fractol,}
+// };

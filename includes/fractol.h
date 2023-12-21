@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 20:35:58 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 00:21:35 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 00:23:31 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ struct s_fractol
 {
 	t_mlx				mlx;
 	t_cl				cl;
+	bool				alive;
 	struct s_threading	threading;
 	struct s_error		error;
 };
@@ -88,8 +89,8 @@ typedef struct s_fractol	t_fractol;
 /*                                                                            */
 /* ************************************************************************** */
 
-extern const t_handlers		g_handlers;
-extern t_fractol			g_fractol;
+// extern const t_handlers		g_handlers;
+// extern t_fractol			g_fractol;
 
 /* ************************************************************************** */
 /*                                                                            */

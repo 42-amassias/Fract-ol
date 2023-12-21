@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 14:00:38 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 00:23:15 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 00:23:19 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ struct s_mlx
 	void				*window;
 	void				*img;
 	char				*screen;
+	struct s_handlers	handlers;
 };
 
 /* ************************************************************************** */

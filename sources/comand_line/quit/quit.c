@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/20 00:12:39 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:19:28 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 00:59:37 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,6 @@ int	command__quit(
 		return (EXIT_FAILURE);
 	}
 	ft_putstr("Goodbye !\n");
-	mlx_loop_end(fractol->mlx.mlx);
+	fractol->alive = false;
 	return (EXIT_SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 21:01:34 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/16 05:05:30 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/20 22:11:45 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,8 +84,7 @@ int	build_kernel(
 	while (i < kernel->arg_count)
 	{
 		kernel->args[i].value = (char *)kernel->_arg_values + off;
-		clSetKernelArg(kernel->kernel, i + CL_KERNEL_PRIVTAE_ARG_COUNT,
-			kernel->args[i].size, kernel->args[i].value);
+		kernel->args[i].need_update_on_device = true;
 		off += kernel->args[i++].size;
 	}
 	return (EXIT_SUCCESS);
