@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/06 15:23:11 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 01:10:51 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 01:19:41 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,15 +52,15 @@ int	handle_mouse(
 		*(cl_double *)fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__DY - CL_KERNEL_PRIVTAE_ARG_COUNT].value
 			+= (((double)(4 * y) / (double)(HEIGHT - 1)) - 2.)
 			/ *(cl_double *)fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__ZOOM - CL_KERNEL_PRIVTAE_ARG_COUNT].value;
-		clSetKernelArg(fractol->cl.current_kernel->kernel, KERNEL_ARG_INDEX__DX, sizeof(cl_double), fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__DX - CL_KERNEL_PRIVTAE_ARG_COUNT].value);
-		clSetKernelArg(fractol->cl.current_kernel->kernel, KERNEL_ARG_INDEX__DY, sizeof(cl_double), fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__DY - CL_KERNEL_PRIVTAE_ARG_COUNT].value);
+		fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__DX - CL_KERNEL_PRIVTAE_ARG_COUNT].need_update_on_device = true;
+		fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__DY - CL_KERNEL_PRIVTAE_ARG_COUNT].need_update_on_device = true;
 	}
 	else if (button == 4)
 		*(cl_double *)fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__ZOOM - CL_KERNEL_PRIVTAE_ARG_COUNT].value *= 1.1;
 	else if (button == 5)
 		*(cl_double *)fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__ZOOM - CL_KERNEL_PRIVTAE_ARG_COUNT].value /= 1.1;
 	if (button == 4 || button == 5)
-		clSetKernelArg(fractol->cl.current_kernel->kernel, KERNEL_ARG_INDEX__ZOOM, sizeof(cl_double), fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__ZOOM - CL_KERNEL_PRIVTAE_ARG_COUNT].value);
+		fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__ZOOM - CL_KERNEL_PRIVTAE_ARG_COUNT].need_update_on_device = true;
 	return (EXIT_SUCCESS);
 }
 
@@ -76,22 +76,22 @@ int	kill_program(
 }
 
 int	update_arguments_on_device(
-		t_cl *cl)
+		t_fractol *fractol)
 {
 	size_t	i;
 	cl_int	error_code;
-	
+
 	i = 0;
-	while (i < cl->current_kernel->arg_count)
+	while (i < fractol->cl.current_kernel->arg_count)
 	{
-		if (cl->current_kernel->args[i].need_update_on_device)
+		if (fractol->cl.current_kernel->args[i].need_update_on_device)
 		{
-			cl->current_kernel->args[i].need_update_on_device = false;
+			fractol->cl.current_kernel->args[i].need_update_on_device = false;
 			// pthread_mutex_lock(&fractol->threading.kernel_arg_mutex);
-			error_code = clSetKernelArg(cl->current_kernel->kernel,
+			error_code = clSetKernelArg(fractol->cl.current_kernel->kernel,
 					i + CL_KERNEL_PRIVTAE_ARG_COUNT,
-					cl->current_kernel->args[i].size,
-					cl->current_kernel->args[i].value);
+					fractol->cl.current_kernel->args[i].size,
+					fractol->cl.current_kernel->args[i].value);
 			// pthread_mutex_unlock(&fractol->threading.kernel_arg_mutex);
 			if (error_code != CL_SUCCESS)
 			{
@@ -99,6 +99,7 @@ int	update_arguments_on_device(
 					error_code);
 				return (EXIT_FAILURE);
 			}
+			fractol->need_redraw = true;
 		}
 		++i;
 	}
@@ -111,7 +112,7 @@ int	update(
 	if (fractol->alive == false)
 		return (EXIT_FAILURE);
 	if (fractol->cl.current_kernel != NULL
-		&& update_arguments_on_device(&fractol->cl))
+		&& update_arguments_on_device(fractol))
 	{
 		fractol->alive = false;
 		return (EXIT_FAILURE);
@@ -127,22 +128,26 @@ int	render(
 
 	if (fractol->cl.current_kernel == NULL)
 		return (EXIT_SUCCESS);
-	error_code = clEnqueueNDRangeKernel(
-			fractol->cl.command_queue, fractol->cl.current_kernel->kernel, 2,
-			NULL, global_work_size, NULL,
-			0, NULL, NULL);
-	if (error_code != CL_SUCCESS)
-		return (ft_printf("Kernel failed (%d) :(\n", error_code), mlx_loop_end(fractol->mlx.mlx), EXIT_FAILURE);
-	error_code = clEnqueueReadBuffer(
-			fractol->cl.command_queue,
-			fractol->cl.cl_screen, CL_TRUE,
-			0, WIDTH * HEIGHT * sizeof(int), fractol->mlx.screen,
-			0, NULL, NULL);
-	if (error_code != CL_SUCCESS)
-		return (ft_printf("Read buffer failed\n"), mlx_loop_end(fractol->mlx.mlx), EXIT_FAILURE);
-	mlx_put_image_to_window(
-		fractol->mlx.mlx, fractol->mlx.window,
-		fractol->mlx.img, 0, 0);
+	if (fractol->need_redraw)
+	{
+		error_code = clEnqueueNDRangeKernel(
+				fractol->cl.command_queue, fractol->cl.current_kernel->kernel, 2,
+				NULL, global_work_size, NULL,
+				0, NULL, NULL);
+		if (error_code != CL_SUCCESS)
+			return (ft_printf("Kernel failed (%d) :(\n", error_code), mlx_loop_end(fractol->mlx.mlx), EXIT_FAILURE);
+		error_code = clEnqueueReadBuffer(
+				fractol->cl.command_queue,
+				fractol->cl.cl_screen, CL_TRUE,
+				0, WIDTH * HEIGHT * sizeof(int), fractol->mlx.screen,
+				0, NULL, NULL);
+		if (error_code != CL_SUCCESS)
+			return (ft_printf("Read buffer failed\n"), mlx_loop_end(fractol->mlx.mlx), EXIT_FAILURE);
+		mlx_put_image_to_window(
+			fractol->mlx.mlx, fractol->mlx.window,
+			fractol->mlx.img, 0, 0);
+		fractol->need_redraw = false;
+	}
 	return (0);
 }
 

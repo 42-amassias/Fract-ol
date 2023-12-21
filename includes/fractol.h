@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 20:35:58 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 00:23:31 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 01:17:10 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ struct s_fractol
 	t_mlx				mlx;
 	t_cl				cl;
 	bool				alive;
+	bool				need_redraw;
 	struct s_threading	threading;
 	struct s_error		error;
 };
