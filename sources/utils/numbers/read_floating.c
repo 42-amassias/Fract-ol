@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/20 03:21:37 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:32:03 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 01:42:41 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@ static const char	*_read_fract(
 /* ************************************************************************** */
 
 cl_double	read_floating(
-			const char *str,
-			const char **end_ptr)
+				const char *str,
+				const char **end_ptr)
 {
 	int			sign;
 	cl_double	value;
@@ -114,7 +114,9 @@ static const char	*_read_fract(
 						const char *str)
 {
 	cl_double	fract;
+	size_t		n;
 
+	n = 0;
 	fract = 0;
 	if (*str != '.')
 		return (_skip_white_spaces(str));
@@ -122,8 +124,11 @@ static const char	*_read_fract(
 	if (*value == 0. && !ft_isdigit(*str))
 		return (str - 1);
 	while (ft_isdigit(*str))
+	{
 		fract = 10. * fract + *str++ - '0';
-	while (fract >= 1.)
+		++n;
+	}
+	while (n--)
 		fract /= 10.;
 	*value += fract;
 	return (_skip_white_spaces(str));
