@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/20 22:51:57 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 00:57:24 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 01:08:23 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,21 @@ void	*command_line_routine(
 	char	*line;
 	char	*end;
 	bool	has_failed;
+	bool	show_promp;
 
+	show_promp = true;
 	has_failed = false;
 	while (fractol->alive)
 	{
-		show_prompt(has_failed);
+		if (show_promp)
+			show_prompt(has_failed);
+		show_promp = true;
 		line = get_next_line(STDIN_FILENO);
+		if (line == NULL)
+		{
+			show_promp = false;
+			continue ;
+		}
 		end = ft_strchr(line, '\n');
 		if (end)
 			*end = '\0';
