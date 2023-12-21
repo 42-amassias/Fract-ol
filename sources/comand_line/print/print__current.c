@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/20 00:02:45 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:23:40 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 03:49:39 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@
 /* ************************************************************************** */
 
 int	command__print__current(
-		char **tokens,
+		const char **tokens,
 		t_cl *cl)
 {
 	const char	*kernel_name;

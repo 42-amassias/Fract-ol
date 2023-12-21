@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 23:53:55 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 20:27:07 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 04:14:57 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int	change_param(
 // -----
 
 int	command__quit(
-		char **tokens,
+		const char **tokens,
 		t_fractol *fractol);
 
 // -----
@@ -74,23 +74,23 @@ int	command__quit(
 // -----
 
 int	command__set(
-		char **tokens,
+		const char **tokens,
 		t_cl *cl);
 
 int	command__set__param(
-		char **tokens,
+		const char **tokens,
 		t_cl *cl);
 
 int	command__set__param__name(
-		char **tokens,
+		const char **tokens,
 		t_cl *cl);
 
 int	command__set__kernel(
-		char **tokens,
+		const char **tokens,
 		t_cl *cl);
 
 int	command__set__kernel__name(
-		char **tokens,
+		const char **tokens,
 		t_cl *cl);
 
 // -----
@@ -98,19 +98,41 @@ int	command__set__kernel__name(
 // -----
 
 int	command__print(
-		char **tokens,
+		const char **tokens,
 		t_cl *cl);
 
 int	command__print__params(
-		char **tokens,
+		const char **tokens,
 		t_cl *cl);
 
 int	command__print__current(
-		char **tokens,
+		const char **tokens,
 		t_cl *cl);
 
 int	command__print__kernels(
-		char **tokens,
+		const char **tokens,
 		t_cl *cl);
+
+// -----
+// HELP
+// -----
+
+int	command__help(
+		const char **tokens);
+
+int	command__help__help(
+		const char **tokens);
+
+int	command__help__print(
+		const char **tokens);
+
+int	command__help__print__kernels(
+		const char **tokens);
+
+int	command__help__print__current(
+		const char **tokens);
+
+int	command__help__print__params(
+		const char **tokens);
 
 #endif

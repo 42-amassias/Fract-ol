@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/20 00:13:02 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 02:39:28 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 03:52:05 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,22 +16,24 @@ int	parse_command(
 		const char *input,
 		t_fractol *fractol)
 {
-	char	**tokens;
-	char	**tmp;
-	int		return_code;
+	const char	**tokens;
+	const char	**tmp;
+	int			return_code;
 
-	tokens = ft_split(input, ' ');
+	tokens = (const char **)ft_split(input, ' ');
 	if (tokens == NULL)
 		(void)0;
 	else if (tokens[0] == NULL)
 		return (free(tokens), EXIT_SUCCESS);
-	else if (ft_strcmp(tokens[0], "p") == 0 || ft_strcmp(tokens[0], "print") == 0)
+	else if (ft_strcmp(*tokens, "p") == 0 || ft_strcmp(*tokens, "print") == 0)
 		return_code = command__print(tokens + 1, &fractol->cl);
-	else if (ft_strcmp(tokens[0], "s") == 0 || ft_strcmp(tokens[0], "set") == 0)
+	else if (ft_strcmp(*tokens, "s") == 0 || ft_strcmp(*tokens, "set") == 0)
 		return_code = command__set(tokens + 1, &fractol->cl);
-	else if (ft_strcmp(tokens[0], "q") == 0 || ft_strcmp(tokens[0], "quit") == 0)
+	else if (ft_strcmp(*tokens, "q") == 0 || ft_strcmp(*tokens, "quit") == 0)
 		return_code = command__quit(tokens + 1, fractol);
-	// else if (ft_strcmp(tokens[0], "r") == 0 || ft_strcmp(tokens[0], "reload") == 0)
+	else if (ft_strcmp(*tokens, "h") == 0 || ft_strcmp(*tokens, "help") == 0)
+		return_code = command__help(tokens + 1);
+	// else if (ft_strcmp(*tokens, "r") == 0 || ft_strcmp(*tokens, "reload") == 0)
 	// 	return_code = command__reload(tokens + 1, fractol);
 	else
 	{
@@ -40,7 +42,7 @@ int	parse_command(
 	}
 	tmp = tokens;
 	while (*tmp)
-		free(*tmp++);
-	free(tokens);
+		free((char *)*tmp++);
+	free((char **)tokens);
 	return (return_code);
 }
