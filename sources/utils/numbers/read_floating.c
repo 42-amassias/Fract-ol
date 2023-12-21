@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/20 03:21:37 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 01:42:41 by amassias         ###   ########.fr       */
+/*   Updated: 2023/12/21 01:54:07 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ static const char	*_skip_white_spaces(
 static int	_read_sign(
 				const char **str_ptr)
 {
-	if (**str_ptr != '+' || **str_ptr != '-')
+	if (**str_ptr != '+' && **str_ptr != '-')
 		return (1);
 	*str_ptr = *str_ptr + 1;
 	if ((*str_ptr)[-1] == '-')
@@ -102,8 +102,6 @@ static const char	*_read_integer(
 						const char *str)
 {
 	*value = 0.;
-	if (!ft_isdigit(*str))
-		return (str);
 	while (ft_isdigit(*str))
 		*value = 10. * *value + *str++ - '0';
 	return (str);
@@ -121,8 +119,6 @@ static const char	*_read_fract(
 	if (*str != '.')
 		return (_skip_white_spaces(str));
 	++str;
-	if (*value == 0. && !ft_isdigit(*str))
-		return (str - 1);
 	while (ft_isdigit(*str))
 	{
 		fract = 10. * fract + *str++ - '0';
