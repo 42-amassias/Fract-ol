@@ -3,3 +3,4 @@ fractol
 *.o
 .vscode
 valgrind-supressions
+doc

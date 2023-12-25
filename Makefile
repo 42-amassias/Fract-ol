@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2023/12/25 04:11:35 by amassias         ###   ########.fr        #
+#    Updated: 2023/12/25 06:41:47 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -56,6 +56,8 @@ LFLAGS			:=					\
 # **************************************************************************** #
 
 FILES			:=															\
+	opencl/opencl_init														\
+	utils/read_file_in_buffer												\
 	main																	\
 
 SRCS			:=	$(addprefix $(SRC_DIR)/,$(addsuffix .c,$(FILES)))
