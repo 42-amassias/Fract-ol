@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2023/12/21 04:14:20 by amassias         ###   ########.fr        #
+#    Updated: 2023/12/25 04:11:35 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -56,45 +56,6 @@ LFLAGS			:=					\
 # **************************************************************************** #
 
 FILES			:=															\
-	cl/build_kernel															\
-	cl/build_kernels														\
-	cl/cleanup_kernels														\
-	cl/cleanup_opencl														\
-	cl/get_cl_type_as_str													\
-	cl/get_param_size														\
-	cl/init_kernels															\
-	cl/init_opencl															\
-	cl/kernel_arg_info														\
-	cl/kernel_info															\
-	cl/prime_private_kernel_fields											\
-	comand_line/help/help/help__help										\
-	comand_line/help/print/help__print__current								\
-	comand_line/help/print/help__print__kernels								\
-	comand_line/help/print/help__print__params								\
-	comand_line/help/print/help__print										\
-	comand_line/help/help													\
-	comand_line/print/print													\
-	comand_line/print/print__current										\
-	comand_line/print/print__kernels										\
-	comand_line/print/print__params											\
-	comand_line/quit/quit													\
-	comand_line/set/set														\
-	comand_line/set/set__kernel												\
-	comand_line/set/set__kernel__name										\
-	comand_line/set/set__param												\
-	comand_line/set/set__param__name										\
-	comand_line/utils/change_param											\
-	comand_line/utils/chose_new_kernel										\
-	comand_line/utils/parse_command											\
-	comand_line/command_line												\
-	mlx/cleanup_mlx															\
-	mlx/init_mlx															\
-	mlx/mlx_destroy															\
-	utils/numbers/read_floating												\
-	utils/numbers/read_integer												\
-	utils/print_kernel_param												\
-	utils/read_file															\
-	globals																	\
 	main																	\
 
 SRCS			:=	$(addprefix $(SRC_DIR)/,$(addsuffix .c,$(FILES)))
