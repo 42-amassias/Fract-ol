@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   opencl_init.c                                      :+:      :+:    :+:   */
+/*   query_param_properties.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/25 05:14:29 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/26 17:40:39 by amassias         ###   ########.fr       */
+/*   Created: 2023/12/26 17:20:08 by amassias          #+#    #+#             */
+/*   Updated: 2023/12/26 17:39:29 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /**
- * @file opencl_init.c
+ * @file query_param_properties
  * @author Antoine Massias (amassias@student.42lehavre.fr)
- * @date 2023-12-25
+ * @date 2023-12-26
  * @copyright Copyright (c) 2023
  */
 
@@ -24,9 +24,19 @@
 /* ************************************************************************** */
 
 #include "opencl.h"
-#include "_opencl.h"
 
 #include <libft.h>
+
+/* ************************************************************************** */
+/*                                                                            */
+/* Helper protoypes                                                           */
+/*                                                                            */
+/* ************************************************************************** */
+
+void	_query(
+		t_kernel_argument *arg,
+		const t_kernel_argument_type_data *query
+		);
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -34,30 +44,26 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-t_cl_code	opencl_init(
-				t_cl *cl
-				)
+int	query_param_property(
+		const char *type,
+		t_kernel_argument *arg
+		)
 {
-	cl_uint	c;
-	cl_int	code;
+	size_t	i;
 
-	ft_bzero(cl, sizeof(*cl));
-	code = clGetPlatformIDs(1, &cl->platform, &c);
-	if (c == 0 || code != CL_SUCCESS)
-		return (CL_ERR_NO_PLATFORM);
-	code = clGetDeviceIDs(cl->platform, CL_DEVICE_TYPE_ALL, 1, &cl->device, &c);
-	if (c == 0 || code != CL_SUCCESS)
-		return (opencl_cleanup(cl), CL_ERR_NO_DEVICE);
-	cl->context = clCreateContext(NULL, 1, &cl->device, NULL, NULL, &code);
-	if (code != CL_SUCCESS)
-		return (opencl_cleanup(cl), CL_ERR_CONTEXT_INITIALIZATION_FAILURE);
-	cl->command_queue = clCreateCommandQueueWithProperties(
-			cl->context, cl->device, NULL, &code);
-	if (code != CL_SUCCESS)
-		return (opencl_cleanup(cl),
-			CL_ERR_COMMAND_QUEUE_INITIALIZATION_FAILURE);
-	code = opencl_kernels_initialize(cl);
-	if (code != CL_CODE_SUCCESS)
-		return (opencl_cleanup(cl), code);
-	return (CL_CODE_SUCCESS);
+	i = 0;
+	while (i < _ARG_TYPE_COUNT)
+		if (ft_strcmp(g_kernel_arg_types[i].litteral_name, type) == 0)
+			return (_query(arg, &g_kernel_arg_types[i]), 0);
+	return (1);
+}
+
+void	_query(
+		t_kernel_argument *arg,
+		const t_kernel_argument_type_data *query
+		)
+{
+	arg->size = query->size;
+	arg->type_name = query->litteral_name;
+	arg->type = query->type;
 }

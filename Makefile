@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2023/12/25 06:41:47 by amassias         ###   ########.fr        #
+#    Updated: 2023/12/26 17:21:24 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -56,8 +56,14 @@ LFLAGS			:=					\
 # **************************************************************************** #
 
 FILES			:=															\
+	opencl/kernel/opencl_kernel_build										\
+	opencl/kernel/opencl_kernels_build										\
+	opencl/kernel/opencl_kernels_initialize									\
+	opencl/utils/opencl_get_kernel_arg_info									\
+	opencl/utils/query_param_properties										\
 	opencl/opencl_init														\
 	utils/read_file_in_buffer												\
+	globals																	\
 	main																	\
 
 SRCS			:=	$(addprefix $(SRC_DIR)/,$(addsuffix .c,$(FILES)))
@@ -90,7 +96,6 @@ fcleanlibs:
 
 re:	fclean all
 
-# TODO: Eventually remove the restriction on `main.c`.
 norminette:
 	@norminette												\
 		`find $(SRC_DIR) -type f -name \*.c`				\
