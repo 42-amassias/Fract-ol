@@ -2,5 +2,6 @@ binaries
 fractol
 *.o
 .vscode
-valgrind-supressions
+valgrind_suppress
+valgrind_log
 doc

@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/26 09:40:20 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/26 17:42:59 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/09 12:56:22 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,6 @@ t_cl_code	opencl_kernels_initialize(
 /*                                                                            */
 /* ************************************************************************** */
 
-// TODO: cleanup in case of error for opencl_kernels_build.
 static t_cl_code	_initialize_program(
 						t_cl *cl
 						)

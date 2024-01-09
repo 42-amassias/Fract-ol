@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/26 11:09:17 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/26 17:38:45 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/09 12:44:58 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,6 @@ static int	_query_arguments(
 	}
 	return (CL_CODE_SUCCESS);
 }
-
 
 void	_cleanup_kernel_args(
 			t_kernel_argument *parameters,
