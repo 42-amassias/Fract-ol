@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/25 05:14:29 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/26 17:40:39 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/09 13:48:58 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,5 @@ t_cl_code	opencl_init(
 	if (code != CL_SUCCESS)
 		return (opencl_cleanup(cl),
 			CL_ERR_COMMAND_QUEUE_INITIALIZATION_FAILURE);
-	code = opencl_kernels_initialize(cl);
-	if (code != CL_CODE_SUCCESS)
-		return (opencl_cleanup(cl), code);
 	return (CL_CODE_SUCCESS);
 }

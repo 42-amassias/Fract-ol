@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/26 10:25:47 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/26 17:17:13 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/09 13:40:57 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ t_cl_code	opencl_kernels_build(
 	size_t		i;
 	char		*kernel_name;
 
+	kernel_name = cl->_kernel_names;
 	i = 0;
 	while (i < cl->kernel_count)
 	{
@@ -73,6 +74,12 @@ t_cl_code	opencl_kernels_build(
 	return (CL_SUCCESS);
 }
 
+/* ************************************************************************** */
+/*                                                                            */
+/* Helper implementation                                                      */
+/*                                                                            */
+/* ************************************************************************** */
+
 static char	*_get_next_kernel_name(
 				char *kernel_name
 				)
@@ -80,7 +87,7 @@ static char	*_get_next_kernel_name(
 	while (*kernel_name && *kernel_name != ';')
 		++kernel_name;
 	*kernel_name = '\0';
-	if (kernel_name)
+	if (*kernel_name)
 		return (kernel_name + 1);
 	return (kernel_name);
 }

@@ -1,0 +1,16 @@
+---------------------
+----- Mandatory -----
+---------------------
+
+[x] Make program loading a module rather than a requirement to opencl initialization.
+[ ] Make the MLX wrapper
+[ ] Make the console
+[ ] Make the fractol context
+[ ] Make global initializer
+[ ] Allow the user to load a program given it's path.
+
+---------------
+----- QOL -----
+---------------
+
+[ ] Make documentation for the opencl initialization.
