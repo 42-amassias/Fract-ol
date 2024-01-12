@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 23:53:55 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 04:14:57 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/12 17:44:49 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,12 +54,25 @@ int	parse_command(
 		const char *input,
 		t_fractol *fractol);
 
-int	chose_new_kernel(
-		t_cl *cl);
-
 int	change_param(
 		t_kernel *kernel,
 		cl_uint index);
+
+int	is_type_integer(
+		t_cl_arg_type type
+		);
+
+int	is_type_floating(
+		t_cl_arg_type type
+		);
+
+int	is_type_integer__signed(
+		t_cl_arg_type type
+		);
+
+int	is_type_integer__unsigned(
+		t_cl_arg_type type
+		);
 
 // -----
 // QUIT

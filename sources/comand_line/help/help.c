@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 03:02:52 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 03:55:15 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/12 18:04:17 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+// TODO: implement help for the set command.
+// 	if (ft_strcmp(tokens[0], "set") == 0 || ft_strcmp(tokens[0], "s") == 0)
+// 		return (command__help__set(tokens + 1));
 int	command__help(
 		const char	**tokens)
 {
@@ -67,8 +70,6 @@ int	command__help(
 	}
 	if (ft_strcmp(tokens[0], "print") == 0 || ft_strcmp(tokens[0], "p") == 0)
 		return (command__help__print(tokens + 1));
-	// if (ft_strcmp(tokens[0], "set") == 0 || ft_strcmp(tokens[0], "s") == 0)
-	// 	return (command__help__set(tokens + 1));
 	if (ft_strcmp(tokens[0], "help") == 0 || ft_strcmp(tokens[0], "h") == 0)
 		return (command__help__help(tokens + 1));
 	ft_fprintf(STDERR_FILENO, ERROR__SUB_COMMAND ERROR__HELP, tokens[0]);

@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 13:56:57 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 00:53:17 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/12 17:30:22 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,12 @@ int	init_mlx(
 		return (cleanup_mlx(mlx), EXIT_FAILURE);
 	mlx->screen = mlx_get_data_addr(mlx->img, &_, &_, &_);
 	mlx_loop_hook(mlx->mlx, _loop, mlx);
-	mlx_expose_hook(mlx->window, mlx->handlers.render, mlx->handlers.context.render);
-	mlx_key_hook(mlx->window, mlx->handlers.keyboard, mlx->handlers.context.keyboard);
-	mlx_mouse_hook(mlx->window, mlx->handlers.mouse, mlx->handlers.context.mouse);
+	mlx_expose_hook(mlx->window,
+		mlx->handlers.render, mlx->handlers.context.render);
+	mlx_key_hook(mlx->window,
+		mlx->handlers.keyboard, mlx->handlers.context.keyboard);
+	mlx_mouse_hook(mlx->window,
+		mlx->handlers.mouse, mlx->handlers.context.mouse);
 	mlx_set_font(mlx->mlx, mlx->window, WINDOW_X_FONT);
 	return (EXIT_SUCCESS);
 }

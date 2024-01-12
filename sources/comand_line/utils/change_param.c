@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/20 00:00:11 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 01:54:53 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/12 18:09:29 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,82 +25,103 @@
 #define ERROR_TYPE__F "Floating point parameter malformed.\n"
 #define ERROR_TYPE__I "Integer parameter malformed.\n"
 
-static int	_is_type_integer(
-				t_cl_arg_type type);
+int	handle_floating(
+		t_cl_arg_type type,
+		char *line,
+		void *value_ptr
+		)
+{
+	const char	*end;
+	double		value;
 
-static int	_is_type_floating(
-				t_cl_arg_type type);
+	value = read_floating(line, &end);
+	if (*end != '\n' && *end != '\0')
+		return (ft_fprintf(STDERR_FILENO, ERROR_TYPE__F), EXIT_FAILURE);
+	if ((type & CL_ARG_TYPE__TYPE_MASK)
+		== (CL_ARG_TYPE__DOUBLE & CL_ARG_TYPE__TYPE_MASK))
+		*(cl_double *)value_ptr = value;
+	else
+		*(cl_float *)value_ptr = value;
+	return (EXIT_SUCCESS);
+}
+
+int	handle_integer__signed(
+		t_cl_arg_type type,
+		char *line,
+		void *value_ptr
+		)
+{
+	const char	*end;
+	long		value;
+
+	value = read_integer_signed(line, &end);
+	if (*end != '\n' && *end != '\0')
+		return (ft_fprintf(STDERR_FILENO, ERROR_TYPE__I), EXIT_FAILURE);
+	if ((type & CL_ARG_TYPE__TYPE_MASK)
+		== (CL_ARG_TYPE__CHAR & CL_ARG_TYPE__TYPE_MASK))
+		*(cl_char *)value_ptr = value;
+	else if ((type & CL_ARG_TYPE__TYPE_MASK)
+		== (CL_ARG_TYPE__SHORT & CL_ARG_TYPE__TYPE_MASK))
+		*(cl_short *)value_ptr = value;
+	else if ((type & CL_ARG_TYPE__TYPE_MASK)
+		== (CL_ARG_TYPE__INT & CL_ARG_TYPE__TYPE_MASK))
+		*(cl_int *)value_ptr = value;
+	else
+		*(cl_long *)value_ptr = value;
+	return (EXIT_SUCCESS);
+}
+
+int	handle_integer__unsigned(
+		t_cl_arg_type type,
+		char *line,
+		void *value_ptr
+		)
+{
+	const char	*end;
+	long		value;
+
+	value = read_integer_unsigned(line, &end);
+	if (*end != '\n' && *end != '\0')
+		return (ft_fprintf(STDERR_FILENO, ERROR_TYPE__I), EXIT_FAILURE);
+	if ((type & CL_ARG_TYPE__TYPE_MASK)
+		== (CL_ARG_TYPE__CHAR & CL_ARG_TYPE__TYPE_MASK))
+		*(cl_uchar *)value_ptr = value;
+	else if ((type & CL_ARG_TYPE__TYPE_MASK)
+		== (CL_ARG_TYPE__SHORT & CL_ARG_TYPE__TYPE_MASK))
+		*(cl_ushort *)value_ptr = value;
+	else if ((type & CL_ARG_TYPE__TYPE_MASK)
+		== (CL_ARG_TYPE__INT & CL_ARG_TYPE__TYPE_MASK))
+		*(cl_uint *)value_ptr = value;
+	else
+		*(cl_ulong *)value_ptr = value;
+	return (EXIT_SUCCESS);
+}
 
 int	change_param(
 		t_kernel *kernel,
 		cl_uint index)
 {
 	char			*line;
-	const char		*end;
 	t_kernel_arg	*arg;
-	t_type			t;
+	int				code;
 
+	code = EXIT_SUCCESS;
 	arg = &kernel->args[index];
 	ft_printf("%-15s %-15s = ", get_cl_type_as_str(arg->type), arg->name);
 	line = get_next_line(STDIN_FILENO);
 	if (line == NULL)
 		return (ft_fprintf(STDERR_FILENO, ERROR__INTERNAL), EXIT_FAILURE);
-	if (_is_type_floating(arg->type))
-	{
-		t.d = read_floating(line, &end);
-		if (*end != '\n' && *end != '\0')
-			return (free(line), ft_fprintf(STDERR_FILENO, ERROR_TYPE__F), EXIT_FAILURE);
-		if ((arg->type & CL_ARG_TYPE__TYPE_MASK) == (CL_ARG_TYPE__DOUBLE & CL_ARG_TYPE__TYPE_MASK))
-			*(cl_double *)arg->value = t.d;
-		else
-			*(cl_float *)arg->value = t.d;
-	}
-	else if (_is_type_integer(arg->type))
-	{
-		if ((arg->type & CL_ARG_TYPE__ATTR_MASK) == CL_ARG_TYPE_ATTR_SIGNED)
-		{
-			t.l = read_integer_signed(line, &end);
-			if (*end != '\n' && *end != '\0')
-				return (free(line), ft_fprintf(STDERR_FILENO, ERROR_TYPE__I), EXIT_FAILURE);
-			if ((arg->type & CL_ARG_TYPE__TYPE_MASK) == (CL_ARG_TYPE__CHAR & CL_ARG_TYPE__TYPE_MASK))
-				*(cl_char *)arg->value = t.l;
-			else if ((arg->type & CL_ARG_TYPE__TYPE_MASK) == (CL_ARG_TYPE__SHORT & CL_ARG_TYPE__TYPE_MASK))
-				*(cl_short *)arg->value = t.l;
-			else if ((arg->type & CL_ARG_TYPE__TYPE_MASK) == (CL_ARG_TYPE__INT & CL_ARG_TYPE__TYPE_MASK))
-				*(cl_int *)arg->value = t.l;
-			else
-				*(cl_long *)arg->value = t.l;
-		}
-		else
-		{
-			t.u = read_integer_unsigned(line, &end);
-			if (*end != '\n' && *end != '\0')
-				return (free(line), ft_fprintf(STDERR_FILENO, ERROR_TYPE__I), EXIT_FAILURE);
-			if ((arg->type & CL_ARG_TYPE__TYPE_MASK) == (CL_ARG_TYPE__CHAR & CL_ARG_TYPE__TYPE_MASK))
-				*(cl_uchar *)arg->value = t.u;
-			else if ((arg->type & CL_ARG_TYPE__TYPE_MASK) == (CL_ARG_TYPE__SHORT & CL_ARG_TYPE__TYPE_MASK))
-				*(cl_ushort *)arg->value = t.u;
-			else if ((arg->type & CL_ARG_TYPE__TYPE_MASK) == (CL_ARG_TYPE__INT & CL_ARG_TYPE__TYPE_MASK))
-				*(cl_uint *)arg->value = t.u;
-			else
-				*(cl_ulong *)arg->value = t.u;
-		}
-	}
+	if (is_type_floating(arg->type))
+		code = handle_floating(arg->type, line, arg->value);
+	else if (is_type_integer__signed(arg->type))
+		code = handle_integer__signed(arg->type, line, arg->value);
+	else if (is_type_integer__unsigned(arg->type))
+		code = handle_integer__unsigned(arg->type, line, arg->value);
 	else
 		ft_memset(arg->value, 0, arg->size);
 	free(line);
+	if (code)
+		return (EXIT_FAILURE);
 	arg->need_update_on_device = true;
 	return (EXIT_SUCCESS);
-}
-
-static int	_is_type_integer(
-				t_cl_arg_type type)
-{
-	return ((type & CL_ARG_TYPE__CATEGORY_MASK) == CL_ARG_TYPE_INTEGER);
-}
-
-static int	_is_type_floating(
-				t_cl_arg_type type)
-{
-	return ((type & CL_ARG_TYPE__CATEGORY_MASK) == CL_ARG_TYPE_FLOATING);
 }

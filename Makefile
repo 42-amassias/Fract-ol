@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2023/12/21 04:14:20 by amassias         ###   ########.fr        #
+#    Updated: 2024/01/12 17:45:09 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -84,7 +84,7 @@ FILES			:=															\
 	comand_line/set/set__param												\
 	comand_line/set/set__param__name										\
 	comand_line/utils/change_param											\
-	comand_line/utils/chose_new_kernel										\
+	comand_line/utils/kernel_arg_type										\
 	comand_line/utils/parse_command											\
 	comand_line/command_line												\
 	mlx/cleanup_mlx															\

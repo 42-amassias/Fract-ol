@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/20 22:51:57 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 01:08:23 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/12 17:35:14 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #define STATUS_ERR "\033[31m"
 #define COLOR_RESET "\033[0m"
 
-void	show_prompt(
+void	_show_prompt(
 			int status)
 {
 	const char	*status_color;
@@ -33,27 +33,22 @@ void	*command_line_routine(
 	char	*line;
 	char	*end;
 	bool	has_failed;
-	bool	show_promp;
+	bool	show_prompt;
 
-	show_promp = true;
+	show_prompt = true;
 	has_failed = false;
 	while (fractol->alive)
 	{
-		if (show_promp)
-			show_prompt(has_failed);
-		show_promp = true;
+		if (show_prompt)
+			_show_prompt(has_failed);
 		line = get_next_line(STDIN_FILENO);
-		if (line == NULL)
-		{
-			show_promp = false;
+		show_prompt = line != NULL;
+		if (!show_prompt)
 			continue ;
-		}
 		end = ft_strchr(line, '\n');
 		if (end)
 			*end = '\0';
-		has_failed = false;
-		if (parse_command(line, fractol))
-			has_failed = true;
+		has_failed = parse_command(line, fractol) != 0;
 		free(line);
 	}
 	fractol->alive = false;

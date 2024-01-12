@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/06 15:23:11 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 01:19:41 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/12 18:07:18 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,12 +87,10 @@ int	update_arguments_on_device(
 		if (fractol->cl.current_kernel->args[i].need_update_on_device)
 		{
 			fractol->cl.current_kernel->args[i].need_update_on_device = false;
-			// pthread_mutex_lock(&fractol->threading.kernel_arg_mutex);
 			error_code = clSetKernelArg(fractol->cl.current_kernel->kernel,
 					i + CL_KERNEL_PRIVTAE_ARG_COUNT,
 					fractol->cl.current_kernel->args[i].size,
 					fractol->cl.current_kernel->args[i].value);
-			// pthread_mutex_unlock(&fractol->threading.kernel_arg_mutex);
 			if (error_code != CL_SUCCESS)
 			{
 				ft_fprintf(STDERR_FILENO, "Error: Opencl internal error (%d)\n",
@@ -130,21 +128,19 @@ int	render(
 		return (EXIT_SUCCESS);
 	if (fractol->need_redraw)
 	{
-		error_code = clEnqueueNDRangeKernel(
-				fractol->cl.command_queue, fractol->cl.current_kernel->kernel, 2,
-				NULL, global_work_size, NULL,
-				0, NULL, NULL);
+		error_code = clEnqueueNDRangeKernel(fractol->cl.command_queue,
+				fractol->cl.current_kernel->kernel, 2, NULL, global_work_size,
+				NULL, 0, NULL, NULL);
 		if (error_code != CL_SUCCESS)
-			return (ft_printf("Kernel failed (%d) :(\n", error_code), mlx_loop_end(fractol->mlx.mlx), EXIT_FAILURE);
-		error_code = clEnqueueReadBuffer(
-				fractol->cl.command_queue,
-				fractol->cl.cl_screen, CL_TRUE,
-				0, WIDTH * HEIGHT * sizeof(int), fractol->mlx.screen,
-				0, NULL, NULL);
+			return (ft_printf("Kernel failed (%d) :(\n", error_code),
+				mlx_loop_end(fractol->mlx.mlx), EXIT_FAILURE);
+		error_code = clEnqueueReadBuffer(fractol->cl.command_queue,
+				fractol->cl.cl_screen, CL_TRUE, 0, WIDTH * HEIGHT * sizeof(int),
+				fractol->mlx.screen, 0, NULL, NULL);
 		if (error_code != CL_SUCCESS)
-			return (ft_printf("Read buffer failed\n"), mlx_loop_end(fractol->mlx.mlx), EXIT_FAILURE);
-		mlx_put_image_to_window(
-			fractol->mlx.mlx, fractol->mlx.window,
+			return (ft_printf("Read buffer failed\n"),
+				mlx_loop_end(fractol->mlx.mlx), EXIT_FAILURE);
+		mlx_put_image_to_window(fractol->mlx.mlx, fractol->mlx.window,
 			fractol->mlx.img, 0, 0);
 		fractol->need_redraw = false;
 	}
@@ -161,32 +157,12 @@ void	full_cleanup(
 void	*rendering_software(
 			t_fractol *fractol)
 {
-	// if (init_mlx(&fractol->mlx, WIDTH, HEIGHT))
-	// {
-	// 	fractol->error.code = EXIT_FAILURE;
-	// 	fractol->error.message = "Failed to initialize MLX";
-	// 	fractol->alive = false;
-	// 	return (NULL);
-	// }
-	// if (init_opencl(&fractol->cl, fractol->mlx.screen, WIDTH * HEIGHT))
-	// {
-	// 	fractol->error.code = EXIT_FAILURE;
-	// 	fractol->error.message = "Failed to initialize OpenCL";
-	// 	fractol->alive = false;
-	// 	return (NULL);
-	// }
-	// if (prime_private_kernel_fields(&fractol->cl, WIDTH, HEIGHT))
-	// {
-	// 	fractol->error.code = EXIT_FAILURE;
-	// 	fractol->error.message = "Failed to prime OpenCL kernels";
-	// 	fractol->alive = false;
-	// 	return (NULL);
-	// }
 	mlx_loop(fractol->mlx.mlx);
 	fractol->alive = false;
 	return (NULL);
 }
 
+// TODO: make function pointer types to pass the norminette...
 void	init_handlers(
 			t_fractol *fractol)
 {
@@ -231,9 +207,8 @@ int	main(void)
 		return (free(fractol), EXIT_FAILURE);
 	}
 	fractol->alive = true;
-	if (pthread_create(
-		&fractol->threading.renderer, NULL,
-		(void *(*)(void *))rendering_software, fractol))
+	if (pthread_create(&fractol->threading.renderer, NULL,
+			(void *(*)(void *))rendering_software, fractol))
 	{
 		perror("Renderer initialization");
 		return (EXIT_FAILURE);
