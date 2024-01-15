@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 16:52:10 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/15 16:53:31 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 17:49:07 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,9 @@
 /* ************************************************************************** */
 
 int	update_arguments_on_device(
-		t_cl *cl)
+		t_cl *cl,
+		bool *has_updated
+		)
 {
 	size_t	i;
 	cl_int	error_code;
@@ -52,6 +54,7 @@ int	update_arguments_on_device(
 			return (EXIT_FAILURE);
 		}
 		++i;
+		*has_updated = true;
 	}
 	return (EXIT_SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 16:44:10 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/15 17:22:26 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 17:49:42 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,15 @@
 
 /* ************************************************************************** */
 /*                                                                            */
+/* Defines                                                                    */
+/*                                                                            */
+/* ************************************************************************** */
+
+#define F_ZOOM 1.1
+#define D_MOVE 0.1
+
+/* ************************************************************************** */
+/*                                                                            */
 /* Header implementation                                                      */
 /*                                                                            */
 /* ************************************************************************** */
@@ -40,8 +49,29 @@ int	handle_keys(
 		int keycode,
 		t_fractol *fractol)
 {
+	t_cl	*cl;
+
+	if (fractol->cl.current_kernel == NULL)
+		return (EXIT_SUCCESS);
+	cl = &fractol->cl;
 	if (keycode == XK_Escape || keycode == XK_q)
 		mlx_loop_end(fractol->mlx.mlx);
+	if (keycode == XK_Up)
+		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__DY)->value -= D_MOVE
+			/ *(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value;
+	if (keycode == XK_Down)
+		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__DY)->value += D_MOVE
+			/ *(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value;
+	if (keycode == XK_Left)
+		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__DX)->value -= D_MOVE
+			/ *(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value;
+	if (keycode == XK_Right)
+		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__DX)->value += D_MOVE
+			/ *(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value;
+	if (keycode == XK_Up || keycode == XK_Down)
+		get_arg(cl, KERNEL_MANDATORY_ARG__DY)->need_update_on_device = true;
+	if (keycode == XK_Left || keycode == XK_Right)
+		get_arg(cl, KERNEL_MANDATORY_ARG__DX)->need_update_on_device = true;
 	return (EXIT_SUCCESS);
 }
 
@@ -69,9 +99,9 @@ int	handle_mouse(
 		get_arg(cl, KERNEL_MANDATORY_ARG__DY)->need_update_on_device = true;
 	}
 	else if (button == MOUSE_BUTTON_WHEEL_UP)
-		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value *= 1.1;
+		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value *= F_ZOOM;
 	else if (button == MOUSE_BUTTON_WHEEL_DOWN)
-		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value /= 1.1;
+		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value /= F_ZOOM;
 	if (button == MOUSE_BUTTON_WHEEL_UP || button == MOUSE_BUTTON_WHEEL_DOWN)
 		get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->need_update_on_device = true;
 	return (EXIT_SUCCESS);
@@ -83,9 +113,8 @@ int	update(
 	if (fractol->alive == false)
 		return (EXIT_FAILURE);
 	if (fractol->cl.current_kernel != NULL
-		&& update_arguments_on_device(&fractol->cl))
+		&& update_arguments_on_device(&fractol->cl, &fractol->need_redraw))
 	{
-		fractol->need_redraw = true;
 		fractol->alive = false;
 		return (EXIT_FAILURE);
 	}
