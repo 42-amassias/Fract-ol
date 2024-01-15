@@ -1,17 +1,14 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.h                                            :+:      :+:    :+:   */
+/*   update_arguments_on_device.c                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/15 13:25:53 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/15 16:42:20 by amassias         ###   ########.fr       */
+/*   Created: 2024/01/15 16:52:10 by amassias          #+#    #+#             */
+/*   Updated: 2024/01/15 16:53:31 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#ifndef UTILS_H
-# define UTILS_H
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -19,39 +16,42 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "opencl.h"
+#include "opencl.h"
 
-# include <stdlib.h>
+#include <libft.h>
 
 /* ************************************************************************** */
 /*                                                                            */
-/* Header protoypes                                                           */
+/* Header implementation                                                      */
 /*                                                                            */
 /* ************************************************************************** */
 
-int				read_file(
-					const char *file_path,
-					char **file_buffer_ptr,
-					size_t *file_size);
+int	update_arguments_on_device(
+		t_cl *cl)
+{
+	size_t	i;
+	cl_int	error_code;
 
-void			print_kernel_param(
-					t_kernel_arg *arg);
-
-cl_long			read_integer_signed(
-					const char *str,
-					const char **end_ptr);
-
-cl_ulong		read_integer_unsigned(
-					const char *str,
-					const char **end_ptr);
-
-cl_double		read_floating(
-					const char *str,
-					const char **end_ptr);
-
-t_kernel_arg	*get_arg(
-					t_cl *cl,
-					t_kernel_mandatory_arg arg_index
-					);
-
-#endif
+	i = 0;
+	while (i < cl->current_kernel->arg_count)
+	{
+		if (!cl->current_kernel->args[i].need_update_on_device)
+		{
+			++i;
+			continue ;
+		}
+		cl->current_kernel->args[i].need_update_on_device = false;
+		error_code = clSetKernelArg(cl->current_kernel->kernel,
+				i + KERNEL_MANDATORY_PRIVATE_ARG_COUNT,
+				cl->current_kernel->args[i].size,
+				cl->current_kernel->args[i].value);
+		if (error_code != CL_SUCCESS)
+		{
+			ft_fprintf(STDERR_FILENO, "Error: Opencl internal error (%d)\n",
+				error_code);
+			return (EXIT_FAILURE);
+		}
+		++i;
+	}
+	return (EXIT_SUCCESS);
+}

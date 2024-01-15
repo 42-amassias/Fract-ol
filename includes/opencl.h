@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 18:14:09 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/15 16:22:17 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 16:52:48 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,6 +195,9 @@ void		cleanup_kernels(
 				size_t count);
 
 void		cleanup_opencl(
+				t_cl *cl);
+
+int			update_arguments_on_device(
 				t_cl *cl);
 
 int			cl_get_kernel_info__int(

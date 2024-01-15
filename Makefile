@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2024/01/15 16:35:47 by amassias         ###   ########.fr        #
+#    Updated: 2024/01/15 16:53:15 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -67,6 +67,7 @@ FILES			:=															\
 	cl/kernel_arg_info														\
 	cl/kernel_info															\
 	cl/prime_private_kernel_fields											\
+	cl/update_arguments_on_device											\
 	command_line/help/help/help__help										\
 	command_line/help/print/help__print__current							\
 	command_line/help/print/help__print__kernels							\
@@ -92,8 +93,10 @@ FILES			:=															\
 	mlx/mlx_destroy															\
 	utils/numbers/read_floating												\
 	utils/numbers/read_integer												\
+	utils/get_arg															\
 	utils/print_kernel_param												\
 	utils/read_file															\
+	handlers																\
 	globals																	\
 	main																	\
 
@@ -107,9 +110,11 @@ OBJS			:=	$(addprefix $(BIN_DIR)/,$(addsuffix .o,$(FILES)))
 #                                                                              #
 # **************************************************************************** #
 
-.PHONY: all clean fclean re cleanlibs fcleanlibs norminette debug run
+.PHONY: all bonus clean fclean re cleanlibs fcleanlibs norminette debug run
 
 all: $(NAME)
+
+bonus: $(NAME)
 
 clean:
 	rm -f $(OBJS)
