@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/20 00:12:39 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 03:49:55 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 16:22:31 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,6 @@
 /* Header implementation                                                      */
 /*                                                                            */
 /* ************************************************************************** */
-
-// TODO: instead of `mlx_loop_end`, set a flag.
 
 int	command__quit(
 		const char **tokens,

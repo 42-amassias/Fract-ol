@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 18:14:09 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/12 18:07:36 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 16:22:17 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,7 @@
 
 # define LOG_SIZE 4096
 
-# define KERNEL_ARG_INDEX__BUFFER 0
-# define KERNEL_ARG_INDEX__WIDTH 1
-# define KERNEL_ARG_INDEX__HEIGHT 2
-# define KERNEL_ARG_INDEX__DX 3
-# define KERNEL_ARG_INDEX__DY 4
-# define KERNEL_ARG_INDEX__ZOOM 5
-
 # define CL_TYPE_COUNT 10
-# define CL_KERNEL_NEEDED_ARG_COUNT 6
-# define CL_KERNEL_PRIVTAE_ARG_COUNT 3
 
 # define CL_ARG_TYPE__TYPE_MASK 0x00F
 # define CL_ARG_TYPE__ATTR_MASK 0x0F0
@@ -69,7 +60,18 @@ enum e_cl_arg_type
 	CL_ARG_TYPE_FLOATING = 0x200,
 	CL_ARG_TYPE__FLOAT,
 	CL_ARG_TYPE__DOUBLE,
-	CL_ARG_TYPE_COUNT,
+};
+
+enum e_kernel_mandatory_arg
+{
+	KERNEL_MANDATORY_ARG__BUFFER,
+	KERNEL_MANDATORY_ARG__WIDTH,
+	KERNEL_MANDATORY_ARG__HEIGHT,
+	KERNEL_MANDATORY_PRIVATE_ARG_COUNT,
+	KERNEL_MANDATORY_ARG__DX = KERNEL_MANDATORY_PRIVATE_ARG_COUNT,
+	KERNEL_MANDATORY_ARG__DY,
+	KERNEL_MANDATORY_ARG__ZOOM,
+	KERNEL_MANDATORY_ARG_COUNT
 };
 
 /* ************************************************************************** */
@@ -132,17 +134,19 @@ struct s_cl
 /*                                                                            */
 /* ************************************************************************** */
 
-typedef enum e_cl_arg_type	t_cl_arg_type;
+typedef enum e_cl_arg_type			t_cl_arg_type;
 
-typedef struct s_arg_info	t_arg_info;
+typedef enum e_kernel_mandatory_arg	t_kernel_mandatory_arg;
 
-typedef struct s_cl_type	t_cl_type;
+typedef struct s_arg_info			t_arg_info;
 
-typedef struct s_kernel_arg	t_kernel_arg;
+typedef struct s_cl_type			t_cl_type;
 
-typedef struct s_kernel		t_kernel;
+typedef struct s_kernel_arg			t_kernel_arg;
 
-typedef struct s_cl			t_cl;
+typedef struct s_kernel				t_kernel;
+
+typedef struct s_cl					t_cl;
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -150,8 +154,11 @@ typedef struct s_cl			t_cl;
 /*                                                                            */
 /* ************************************************************************** */
 
-extern const t_cl_type		g_cl_types[CL_TYPE_COUNT];
-extern const t_arg_info		g_needed_kernel_args[CL_KERNEL_NEEDED_ARG_COUNT];
+extern const t_cl_type				g_cl_types
+[CL_TYPE_COUNT];
+
+extern const t_arg_info				g_needed_kernel_args
+[KERNEL_MANDATORY_ARG_COUNT];
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -187,7 +194,6 @@ void		cleanup_kernels(
 				t_cl *cl,
 				size_t count);
 
-// TODO: cleanup kernels
 void		cleanup_opencl(
 				t_cl *cl);
 

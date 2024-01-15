@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 05:06:36 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/16 05:18:12 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 15:27:13 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,16 +37,16 @@ int	prime_private_kernel_fields(
 	i = 0;
 	while (i++ < cl->kernel_count)
 	{
-		error_code = clSetKernelArg(kernel->kernel, KERNEL_ARG_INDEX__BUFFER,
-				sizeof(cl_mem), &cl->cl_screen);
+		error_code = clSetKernelArg(kernel->kernel,
+				KERNEL_MANDATORY_ARG__BUFFER, sizeof(cl_mem), &cl->cl_screen);
 		if (error_code != CL_SUCCESS)
 			return (EXIT_FAILURE);
-		error_code = clSetKernelArg(kernel->kernel, KERNEL_ARG_INDEX__WIDTH,
+		error_code = clSetKernelArg(kernel->kernel, KERNEL_MANDATORY_ARG__WIDTH,
 				sizeof(cl_uint), &width);
 		if (error_code != CL_SUCCESS)
 			return (EXIT_FAILURE);
-		error_code = clSetKernelArg(kernel->kernel, KERNEL_ARG_INDEX__HEIGHT,
-				sizeof(cl_uint), &height);
+		error_code = clSetKernelArg(kernel->kernel,
+				KERNEL_MANDATORY_ARG__HEIGHT, sizeof(cl_uint), &height);
 		if (error_code != CL_SUCCESS)
 			return (EXIT_FAILURE);
 		++kernel;

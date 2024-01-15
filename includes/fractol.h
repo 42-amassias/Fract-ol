@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 20:35:58 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/21 01:17:10 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 16:17:32 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-struct s_error
-{
-	int			code;
-	const char	*message;
-};
-
 struct s_threading
 {
 	struct s_is_alive
@@ -69,7 +63,6 @@ struct s_fractol
 	bool				alive;
 	bool				need_redraw;
 	struct s_threading	threading;
-	struct s_error		error;
 };
 
 /* ************************************************************************** */

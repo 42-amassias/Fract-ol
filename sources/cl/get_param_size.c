@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 12:59:58 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 02:11:26 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 15:26:46 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,13 +45,13 @@ int	get_param_size(
 	if (_is_type_ptr(type))
 		type = "pointer";
 	i = 0;
-	while (i < CL_ARG_TYPE_COUNT)
+	while (i < CL_TYPE_COUNT)
 	{
 		if (ft_strcmp(type, g_cl_types[i].str_type) == 0)
 			break ;
 		++i;
 	}
-	if (i == CL_ARG_TYPE_COUNT)
+	if (i == CL_TYPE_COUNT)
 		return (EXIT_FAILURE);
 	*size = g_cl_types[i].size;
 	*internal_type = g_cl_types[i].internal_type;

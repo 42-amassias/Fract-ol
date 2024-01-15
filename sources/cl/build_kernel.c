@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/14 21:01:34 by amassias          #+#    #+#             */
-/*   Updated: 2023/12/20 22:11:45 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 15:26:16 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,11 +104,11 @@ static int	_get_argument_count_and_verify_mandatory_arguments(
 	if (cl_get_kernel_info__int(
 			kernel->kernel, CL_KERNEL_NUM_ARGS, &kernel->arg_count))
 		return (EXIT_FAILURE);
-	if (kernel->arg_count < CL_KERNEL_NEEDED_ARG_COUNT)
+	if (kernel->arg_count < KERNEL_MANDATORY_ARG_COUNT)
 		return (ft_printf(MISSING_ARGUMENTS_ERROR_MESSAGE), EXIT_FAILURE);
-	kernel->arg_count -= CL_KERNEL_PRIVTAE_ARG_COUNT;
+	kernel->arg_count -= KERNEL_MANDATORY_PRIVATE_ARG_COUNT;
 	i = 0;
-	while (i < CL_KERNEL_NEEDED_ARG_COUNT)
+	while (i < KERNEL_MANDATORY_ARG_COUNT)
 		if (_check_special_argument(kernel, &g_needed_kernel_args[i++]))
 			return (EXIT_FAILURE);
 	kernel->args = (t_kernel_arg *)
@@ -158,11 +158,11 @@ static int	_query_arguments(
 	while (i < kernel->arg_count)
 	{
 		if (cl_get_kernel_arg_info__str(
-				kernel->kernel, i + CL_KERNEL_PRIVTAE_ARG_COUNT,
+				kernel->kernel, i + KERNEL_MANDATORY_PRIVATE_ARG_COUNT,
 				CL_KERNEL_ARG_NAME, (void **)&kernel->args[i].name))
 			return (_cleanup_kernel_args(kernel->args, i), EXIT_FAILURE);
 		if (cl_get_kernel_arg_info__str(
-				kernel->kernel, i + CL_KERNEL_PRIVTAE_ARG_COUNT,
+				kernel->kernel, i + KERNEL_MANDATORY_PRIVATE_ARG_COUNT,
 				CL_KERNEL_ARG_TYPE_NAME, (void **)&type))
 			return (free((char *)kernel->name),
 				_cleanup_kernel_args(kernel->args, i), EXIT_FAILURE);

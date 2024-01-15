@@ -67,26 +67,26 @@ FILES			:=															\
 	cl/kernel_arg_info														\
 	cl/kernel_info															\
 	cl/prime_private_kernel_fields											\
-	comand_line/help/help/help__help										\
-	comand_line/help/print/help__print__current								\
-	comand_line/help/print/help__print__kernels								\
-	comand_line/help/print/help__print__params								\
-	comand_line/help/print/help__print										\
-	comand_line/help/help													\
-	comand_line/print/print													\
-	comand_line/print/print__current										\
-	comand_line/print/print__kernels										\
-	comand_line/print/print__params											\
-	comand_line/quit/quit													\
-	comand_line/set/set														\
-	comand_line/set/set__kernel												\
-	comand_line/set/set__kernel__name										\
-	comand_line/set/set__param												\
-	comand_line/set/set__param__name										\
-	comand_line/utils/change_param											\
-	comand_line/utils/kernel_arg_type										\
-	comand_line/utils/parse_command											\
-	comand_line/command_line												\
+	command_line/help/help/help__help										\
+	command_line/help/print/help__print__current							\
+	command_line/help/print/help__print__kernels							\
+	command_line/help/print/help__print__params								\
+	command_line/help/print/help__print										\
+	command_line/help/help													\
+	command_line/print/print												\
+	command_line/print/print__current										\
+	command_line/print/print__kernels										\
+	command_line/print/print__params										\
+	command_line/quit/quit													\
+	command_line/set/set													\
+	command_line/set/set__kernel											\
+	command_line/set/set__kernel__name										\
+	command_line/set/set__param												\
+	command_line/set/set__param__name										\
+	command_line/utils/change_param											\
+	command_line/utils/kernel_arg_type										\
+	command_line/utils/parse_command										\
+	command_line/command_line												\
 	mlx/cleanup_mlx															\
 	mlx/init_mlx															\
 	mlx/mlx_destroy															\

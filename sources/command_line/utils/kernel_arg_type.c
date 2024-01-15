@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/12 17:41:08 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/12 17:45:23 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 16:15:23 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,16 @@ int	is_type_integer(
 		t_cl_arg_type type
 		)
 {
-	return ((type & CL_ARG_TYPE__CATEGORY_MASK) == CL_ARG_TYPE_INTEGER);
+	return ((type & CL_ARG_TYPE__CATEGORY_MASK)
+		== (CL_ARG_TYPE_INTEGER & CL_ARG_TYPE__CATEGORY_MASK));
 }
 
 int	is_type_floating(
 		t_cl_arg_type type
 		)
 {
-	return ((type & CL_ARG_TYPE__CATEGORY_MASK) == CL_ARG_TYPE_FLOATING);
+	return ((type & CL_ARG_TYPE__CATEGORY_MASK)
+		== (CL_ARG_TYPE_FLOATING & CL_ARG_TYPE__CATEGORY_MASK));
 }
 
 int	is_type_integer__signed(
@@ -51,7 +53,8 @@ int	is_type_integer__signed(
 {
 	return (
 		is_type_integer(type)
-		&& (type & CL_ARG_TYPE__ATTR_MASK) == CL_ARG_TYPE_ATTR_SIGNED);
+		&& ((type & CL_ARG_TYPE__ATTR_MASK)
+			== (CL_ARG_TYPE_ATTR_SIGNED & CL_ARG_TYPE__ATTR_MASK)));
 }
 
 int	is_type_integer__unsigned(
@@ -60,5 +63,6 @@ int	is_type_integer__unsigned(
 {
 	return (
 		is_type_integer(type)
-		&& (type & CL_ARG_TYPE__ATTR_MASK) == CL_ARG_TYPE_ATTR_UNSIGNED);
+		&& ((type & CL_ARG_TYPE__ATTR_MASK)
+			== (CL_ARG_TYPE_ATTR_UNSIGNED & CL_ARG_TYPE__ATTR_MASK)));
 }

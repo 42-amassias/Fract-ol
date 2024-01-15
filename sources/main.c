@@ -6,11 +6,9 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/06 15:23:11 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/12 18:07:18 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 16:30:21 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-// TODO: finish command line thread to get read of "_command_line_internal.h"
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -25,6 +23,17 @@
 #include "command_line.h"
 
 #include <X11/Xlib.h>
+
+static t_kernel_arg	*get_arg(
+			t_cl *cl,
+			t_kernel_mandatory_arg arg_index
+			)
+{
+	t_kernel_arg	*args;
+
+	args = cl->current_kernel->args;
+	return (args + arg_index - KERNEL_MANDATORY_PRIVATE_ARG_COUNT);
+}
 
 int	handle_keys(
 		int keycode,
@@ -41,38 +50,37 @@ int	handle_mouse(
 		int y,
 		t_fractol *fractol)
 {
+	t_cl	*cl;
+
 	if (fractol->cl.current_kernel == NULL)
 		return (EXIT_SUCCESS);
-	if (button == 1)
+	cl = &fractol->cl;
+	if (button == MOUSE_BUTTON_LEFT)
 	{
-		*(cl_double *)fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__DX - CL_KERNEL_PRIVTAE_ARG_COUNT].value
+		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__DX)->value
 			+= ((double)WIDTH / (double)HEIGHT)
-			* (((double)(4 * x) / (double)(WIDTH - 1)) - 2.)
-			/ *(cl_double *)fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__ZOOM - CL_KERNEL_PRIVTAE_ARG_COUNT].value;
-		*(cl_double *)fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__DY - CL_KERNEL_PRIVTAE_ARG_COUNT].value
-			+= (((double)(4 * y) / (double)(HEIGHT - 1)) - 2.)
-			/ *(cl_double *)fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__ZOOM - CL_KERNEL_PRIVTAE_ARG_COUNT].value;
-		fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__DX - CL_KERNEL_PRIVTAE_ARG_COUNT].need_update_on_device = true;
-		fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__DY - CL_KERNEL_PRIVTAE_ARG_COUNT].need_update_on_device = true;
+			* (((double)(4. * x) / (double)(WIDTH - 1.)) - 2.)
+			/ *(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value;
+		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__DY)->value
+			+= (((double)(4. * y) / (double)(HEIGHT - 1.)) - 2.)
+			/ *(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value;
+		get_arg(cl, KERNEL_MANDATORY_ARG__DX)->need_update_on_device = true;
+		get_arg(cl, KERNEL_MANDATORY_ARG__DY)->need_update_on_device = true;
 	}
-	else if (button == 4)
-		*(cl_double *)fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__ZOOM - CL_KERNEL_PRIVTAE_ARG_COUNT].value *= 1.1;
-	else if (button == 5)
-		*(cl_double *)fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__ZOOM - CL_KERNEL_PRIVTAE_ARG_COUNT].value /= 1.1;
-	if (button == 4 || button == 5)
-		fractol->cl.current_kernel->args[KERNEL_ARG_INDEX__ZOOM - CL_KERNEL_PRIVTAE_ARG_COUNT].need_update_on_device = true;
+	else if (button == MOUSE_BUTTON_WHEEL_UP)
+		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value *= 1.1;
+	else if (button == MOUSE_BUTTON_WHEEL_DOWN)
+		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value /= 1.1;
+	if (button == MOUSE_BUTTON_WHEEL_UP || button == MOUSE_BUTTON_WHEEL_DOWN)
+		get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->need_update_on_device = true;
 	return (EXIT_SUCCESS);
 }
 
 int	kill_program(
-			int code,
-			const char *message,
 			t_fractol *fractol)
 {
-	fractol->error.code = code;
-	fractol->error.message = message;
 	mlx_loop_end(fractol->mlx.mlx);
-	return (code);
+	return (EXIT_FAILURE);
 }
 
 int	update_arguments_on_device(
@@ -88,7 +96,7 @@ int	update_arguments_on_device(
 		{
 			fractol->cl.current_kernel->args[i].need_update_on_device = false;
 			error_code = clSetKernelArg(fractol->cl.current_kernel->kernel,
-					i + CL_KERNEL_PRIVTAE_ARG_COUNT,
+					i + KERNEL_MANDATORY_PRIVATE_ARG_COUNT,
 					fractol->cl.current_kernel->args[i].size,
 					fractol->cl.current_kernel->args[i].value);
 			if (error_code != CL_SUCCESS)
@@ -162,73 +170,70 @@ void	*rendering_software(
 	return (NULL);
 }
 
-// TODO: make function pointer types to pass the norminette...
 void	init_handlers(
 			t_fractol *fractol)
 {
 	ft_memset(&fractol->mlx, 0, sizeof(t_mlx));
-	fractol->mlx.handlers.update = (int (*)(void *))update;
+	fractol->mlx.handlers.update = (t_mlx_updater)update;
 	fractol->mlx.handlers.context.update = fractol;
-	fractol->mlx.handlers.render = (int (*)(void *))render;
+	fractol->mlx.handlers.render = (t_mlx_renderer)render;
 	fractol->mlx.handlers.context.render = fractol;
-	fractol->mlx.handlers.keyboard = (int (*)(int, void *))handle_keys;
+	fractol->mlx.handlers.keyboard = (t_mlx_keys_handler)handle_keys;
 	fractol->mlx.handlers.context.keyboard = fractol;
-	fractol->mlx.handlers.mouse = (int (*)(int, int, int, void *))handle_mouse;
+	fractol->mlx.handlers.mouse = (t_mlx_mouse_handler)handle_mouse;
 	fractol->mlx.handlers.context.mouse = fractol;
 }
 
-int	main(void)
+int	init_systems(
+		t_fractol *fractol)
 {
-	t_fractol	*fractol;
-	int			error_code;
-
-	fractol = (t_fractol *)ft_calloc(1, sizeof(t_fractol));
-	if (fractol == NULL)
-	{
-		ft_fprintf(STDERR_FILENO, "Internal error\n");
-		return (EXIT_FAILURE);
-	}
+	ft_bzero(fractol, sizeof(t_fractol));
 	init_handlers(fractol);
 	if (init_mlx(&fractol->mlx, WIDTH, HEIGHT))
 	{
 		ft_fprintf(STDERR_FILENO, "Failed to initialize MLX");
-		return (free(fractol), EXIT_FAILURE);
+		return (EXIT_FAILURE);
 	}
 	if (init_opencl(&fractol->cl, fractol->mlx.screen, WIDTH * HEIGHT))
 	{
 		ft_fprintf(STDERR_FILENO, "Failed to initialize OpenCL");
 		cleanup_mlx(&fractol->mlx);
-		return (free(fractol), EXIT_FAILURE);
+		return (EXIT_FAILURE);
 	}
 	if (prime_private_kernel_fields(&fractol->cl, WIDTH, HEIGHT))
 	{
 		ft_fprintf(STDERR_FILENO, "Failed to prime OpenCL kernels");
 		full_cleanup(fractol);
-		return (free(fractol), EXIT_FAILURE);
+		return (EXIT_FAILURE);
 	}
-	fractol->alive = true;
-	if (pthread_create(&fractol->threading.renderer, NULL,
-			(void *(*)(void *))rendering_software, fractol))
+	return (EXIT_SUCCESS);
+}
+
+int	main(void)
+{
+	t_fractol	fractol;
+
+	if (init_systems(&fractol))
+		return (EXIT_FAILURE);
+	fractol.alive = true;
+	if (pthread_create(&fractol.threading.renderer, NULL,
+			(void *(*)(void *))rendering_software, &fractol))
 	{
 		perror("Renderer initialization");
 		return (EXIT_FAILURE);
 	}
 	if (pthread_create(
-			&fractol->threading.command_line, NULL,
-			(void *(*)(void *))command_line_routine, fractol))
+			&fractol.threading.command_line, NULL,
+			(void *(*)(void *))command_line_routine, &fractol))
 	{
 		perror("Command line initialization");
-		fractol->alive = false;
-		pthread_join(fractol->threading.renderer, NULL);
+		fractol.alive = false;
+		pthread_join(fractol.threading.renderer, NULL);
 		return (EXIT_FAILURE);
 	}
-	pthread_join(fractol->threading.renderer, NULL);
-	pthread_cancel(fractol->threading.command_line);
-	pthread_join(fractol->threading.command_line, NULL);
-	full_cleanup(fractol);
-	error_code = fractol->error.code;
-	if (error_code != EXIT_SUCCESS && fractol->error.message != NULL)
-		ft_fprintf(STDERR_FILENO, "%s\n", fractol->error.message);
-	free(fractol);
-	return (error_code);
+	pthread_join(fractol.threading.renderer, NULL);
+	pthread_cancel(fractol.threading.command_line);
+	pthread_join(fractol.threading.command_line, NULL);
+	full_cleanup(&fractol);
+	return (EXIT_SUCCESS);
 }
