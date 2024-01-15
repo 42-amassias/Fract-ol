@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 16:44:10 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/15 18:26:36 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 18:31:22 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,9 @@ int	handle_keys(
 	else if (keycode == XK_Right)
 		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__DX)->value += D_MOVE
 			/ *(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value;
-	else if (keycode == XK_Up || keycode == XK_Down)
+	if (keycode == XK_Up || keycode == XK_Down)
 		get_arg(cl, KERNEL_MANDATORY_ARG__DY)->need_update_on_device = true;
-	else if (keycode == XK_Left || keycode == XK_Right)
+	if (keycode == XK_Left || keycode == XK_Right)
 		get_arg(cl, KERNEL_MANDATORY_ARG__DX)->need_update_on_device = true;
 	return (EXIT_SUCCESS);
 }
