@@ -263,3 +263,101 @@ __kernel void	mandelbrot_toulouse(
 
 	screen[x + WIDTH * y] = color;
 }
+
+#define THICKNESS_FACTOR 10
+
+__kernel void	burning_ship_toulouse(
+					__global int *screen,
+					uint width,
+					uint height,
+					double dx,
+					double dy,
+					double zoom,
+					int max_itr,
+					double k
+					)
+{
+	int		x;
+	int		y;
+
+	double	cx;
+	double	cy;
+
+	double	zx;
+	double	zy;
+	double	dcx;
+	double	dcy;
+
+	int		itr;
+
+	int		color;
+
+	bool	inside;
+
+	double	R2;
+	double	v;
+	double	d;
+
+	double	tmp;
+	double	zx2;
+	double	zy2;
+
+	x = get_global_id(0);
+	y = get_global_id(1);
+
+	cx = 4. * ((double) x / ((double) (WIDTH - 1))) - 2.;
+	cy = 4. * ((double) y / ((double) (HEIGHT - 1))) - 2.;
+
+	cx *= ((double) WIDTH) / ((double) HEIGHT);
+
+	cx = cx / zoom + dx;
+	cy = cy / zoom + dy;
+
+	zx = cx;
+	zy = cy;
+	zx2 = zx * zx;
+	zy2 = zy * zy;
+	R2 = zx2 + zy2;
+
+	dcx = 1.;
+	dcy = 0.;
+
+	itr = 0;
+
+	inside = true;
+
+	while (itr++ < max_itr)
+	{
+		if (R2 > THRESHOLD)
+		{
+			inside = false;
+			break ;
+		}
+
+		// dc = 2 * dc * z + 1
+		tmp = dcx;
+		dcx = 2. * (tmp * zx - dcy * zy) + 1;
+		dcy = 2. * (tmp * zy + dcy * zx);
+
+		// z = z*z + c
+		tmp = zx;
+		zx = zx2 - zy2 + cx;
+		zy = 2. * fabs(tmp) * fabs(zy) + cy;
+		zx2 = zx * zx;
+		zy2 = zy * zy;
+		R2 = zx2 + zy2;
+	}
+
+	color = DEFAULT_COLOR;
+	if (!inside)
+	{
+		tmp = log(R2);
+		if (R2 * tmp * tmp < THICKNESS_FACTOR * THICKNESS_FACTOR * (dcx * dcx + dcy * dcy))
+		{
+			v = log(tmp) - LOG2 * (double)itr;
+			color = f(v / k);
+		}
+	}
+
+	screen[x + WIDTH * y] = color;
+}
