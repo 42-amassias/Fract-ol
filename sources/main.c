@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/06 15:23:11 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/15 16:51:59 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 17:21:33 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,6 @@
 #include "mlx_wrapper.h"
 #include "command_line.h"
 #include "utils.h"
-
-#include <X11/Xlib.h>
-
-void	full_cleanup(
-			t_fractol *fractol)
-{
-	cleanup_opencl(&fractol->cl);
-	cleanup_mlx(&fractol->mlx);
-}
 
 void	*rendering_software(
 			t_fractol *fractol)
@@ -72,7 +63,7 @@ int	init_systems(
 	if (prime_private_kernel_fields(&fractol->cl, WIDTH, HEIGHT))
 	{
 		ft_fprintf(STDERR_FILENO, "Failed to prime OpenCL kernels");
-		full_cleanup(fractol);
+		fractol_cleanup(fractol);
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
@@ -103,6 +94,6 @@ int	main(void)
 	pthread_join(fractol.threading.renderer, NULL);
 	pthread_cancel(fractol.threading.command_line);
 	pthread_join(fractol.threading.command_line, NULL);
-	full_cleanup(&fractol);
+	fractol_cleanup(&fractol);
 	return (EXIT_SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 16:44:10 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/15 16:53:43 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 17:22:26 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@
 #include "opencl.h"
 #include "utils.h"
 
+#include <X11/keysym.h>
+
 /* ************************************************************************** */
 /*                                                                            */
 /* Header implementation                                                      */
@@ -38,7 +40,7 @@ int	handle_keys(
 		int keycode,
 		t_fractol *fractol)
 {
-	if (keycode == 'q')
+	if (keycode == XK_Escape || keycode == XK_q)
 		mlx_loop_end(fractol->mlx.mlx);
 	return (EXIT_SUCCESS);
 }

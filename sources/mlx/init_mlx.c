@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 13:56:57 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/12 17:30:22 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 17:30:03 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include "fractol.h"
 
 #include <libft.h>
+#include <X11/Xlib.h>
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -60,6 +61,7 @@ int	init_mlx(
 		mlx->handlers.keyboard, mlx->handlers.context.keyboard);
 	mlx_mouse_hook(mlx->window,
 		mlx->handlers.mouse, mlx->handlers.context.mouse);
+	mlx_hook(mlx->window, DestroyNotify, 0, mlx_loop_end, mlx->mlx);
 	mlx_set_font(mlx->mlx, mlx->window, WINDOW_X_FONT);
 	return (EXIT_SUCCESS);
 }

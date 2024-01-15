@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/13 20:35:58 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/15 16:17:32 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 17:31:01 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,20 +92,23 @@ typedef struct s_fractol	t_fractol;
 /*                                                                            */
 /* ************************************************************************** */
 
-int	update(
-		t_fractol *fractol);
+int		update(
+			t_fractol *fractol);
 
-int	render(
-		t_fractol *fractol);
+int		render(
+			t_fractol *fractol);
 
-int	handle_keys(
-		int keycode,
-		t_fractol *fractol);
+int		handle_keys(
+			int keycode,
+			t_fractol *fractol);
 
-int	handle_mouse(
-		int button,
-		int x,
-		int y,
-		t_fractol *fractol);
+int		handle_mouse(
+			int button,
+			int x,
+			int y,
+			t_fractol *fractol);
+
+void	fractol_cleanup(
+			t_fractol *fractol);
 
 #endif

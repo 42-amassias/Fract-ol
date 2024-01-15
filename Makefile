@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2024/01/15 16:53:15 by amassias         ###   ########.fr        #
+#    Updated: 2024/01/15 17:21:18 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -96,6 +96,7 @@ FILES			:=															\
 	utils/get_arg															\
 	utils/print_kernel_param												\
 	utils/read_file															\
+	fractol_cleanup															\
 	handlers																\
 	globals																	\
 	main																	\
