@@ -6,7 +6,7 @@
 /*   By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/15 16:44:10 by amassias          #+#    #+#             */
-/*   Updated: 2024/01/15 17:49:42 by amassias         ###   ########.fr       */
+/*   Updated: 2024/01/15 18:26:36 by amassias         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,26 +51,26 @@ int	handle_keys(
 {
 	t_cl	*cl;
 
+	if (keycode == XK_Escape || keycode == XK_q)
+		fractol->alive = false;
 	if (fractol->cl.current_kernel == NULL)
 		return (EXIT_SUCCESS);
 	cl = &fractol->cl;
-	if (keycode == XK_Escape || keycode == XK_q)
-		mlx_loop_end(fractol->mlx.mlx);
 	if (keycode == XK_Up)
 		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__DY)->value -= D_MOVE
 			/ *(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value;
-	if (keycode == XK_Down)
+	else if (keycode == XK_Down)
 		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__DY)->value += D_MOVE
 			/ *(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value;
-	if (keycode == XK_Left)
+	else if (keycode == XK_Left)
 		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__DX)->value -= D_MOVE
 			/ *(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value;
-	if (keycode == XK_Right)
+	else if (keycode == XK_Right)
 		*(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__DX)->value += D_MOVE
 			/ *(cl_double *)get_arg(cl, KERNEL_MANDATORY_ARG__ZOOM)->value;
-	if (keycode == XK_Up || keycode == XK_Down)
+	else if (keycode == XK_Up || keycode == XK_Down)
 		get_arg(cl, KERNEL_MANDATORY_ARG__DY)->need_update_on_device = true;
-	if (keycode == XK_Left || keycode == XK_Right)
+	else if (keycode == XK_Left || keycode == XK_Right)
 		get_arg(cl, KERNEL_MANDATORY_ARG__DX)->need_update_on_device = true;
 	return (EXIT_SUCCESS);
 }
