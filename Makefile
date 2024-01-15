@@ -6,7 +6,7 @@
 #    By: amassias <amassias@student.42lehavre.fr    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 21:43:21 by amassias          #+#    #+#              #
-#    Updated: 2024/01/12 17:45:09 by amassias         ###   ########.fr        #
+#    Updated: 2024/01/15 16:35:47 by amassias         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -107,7 +107,7 @@ OBJS			:=	$(addprefix $(BIN_DIR)/,$(addsuffix .o,$(FILES)))
 #                                                                              #
 # **************************************************************************** #
 
-.PHONY: all clean fclean re cleanlibs fcleanlibs norminette
+.PHONY: all clean fclean re cleanlibs fcleanlibs norminette debug run
 
 all: $(NAME)
 
@@ -127,13 +127,22 @@ fcleanlibs:
 
 re:	fclean all
 
-# TODO: Eventually remove the restriction on `main.c`.
 norminette:
 	@norminette												\
 		`find $(SRC_DIR) -type f -name \*.c`				\
 		`find $(INC_DIR) -type f -name \*.h`				\
 		| grep -Ev '^Notice: |OK\!$$'						\
 		&& exit 1 || printf 'Norminette OK!\n' && exit 0
+
+debug: $(NAME)
+	@valgrind							\
+	--show-leak-kinds=all				\
+	--leak-check=full					\
+	--suppressions=valgrind_suppress	\
+	./$(NAME)
+
+run: $(NAME)
+	@./$(NAME)
 
 # **************************************************************************** #
 #                                                                              #
